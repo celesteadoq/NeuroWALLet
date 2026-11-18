@@ -162,3 +162,8 @@ footer {
     font-size: 0.75rem;
     color: var(--cinza-escuro-suave);
 }
+
+footer a {
+    color: var(--laranja-principal);
+    text-decoration: none;
+}
