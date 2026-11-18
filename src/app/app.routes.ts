@@ -18,6 +18,20 @@ export const routes: Routes = [
   },
 
   {
+    path:'verificacao-2-fatores-l',
+    loadComponent:() =>
+        import('./pages/verificacao-2-fatores-l/verificacao-2-fatores-l')
+        .then((m) => m.Verificacao2FatoresL)
+  },
+
+  {
+    path:'verificacao-2-fatores-c',
+    loadComponent:() =>
+        import('./pages/verificacao-2-fatores-c/verificacao-2-fatores-c')
+        .then((m) => m.Verificacao2FatoresC)
+  },
+
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
