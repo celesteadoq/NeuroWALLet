@@ -149,6 +149,10 @@ label{
   cursor: pointer;
 }   
 
+.button-criar a {
+  text-decoration: none;
+}
+
 
 img {
     width: 100px;
@@ -157,10 +161,13 @@ img {
 }
 
 footer {
-    margin-top: 1rem;
+    border-top: 1px solid var(--cinza-claro);
     text-align: center;
     font-size: 0.75rem;
     color: var(--cinza-escuro-suave);
+}
+.login-card footer {
+    padding-top: 1rem;
 }
 
 footer a {
