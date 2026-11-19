@@ -17,6 +17,14 @@ export const routes: Routes = [
 
   },
 
+   {
+      path:'banco',
+      loadComponent:() =>
+          import('./pages/banco/banco')
+          .then((m) => m.Banco)
+
+  },
+
   {
     path:'verificacao-2-fatores-l',
     loadComponent:() =>

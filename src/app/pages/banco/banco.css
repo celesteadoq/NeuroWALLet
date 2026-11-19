@@ -1,0 +1,225 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+main {
+     min-height: 100vh;
+    width: 100%;
+
+    background-image: url("/images/Tela-de-formas.png");
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 32px 32px 24px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: var(--branco);
+    box-shadow: 0 24px 60px rgba(30, 31, 43, 0.14);
+}
+
+.titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--cinza-escuro);
+}
+
+.subtitulo {
+  margin: 6px 0 0;
+  font-size: 0.7125rem;
+  color: var(--cinza-escuro-suave);
+}
+
+input{
+    width: 100%;
+    height: 2.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--cinza-claro);
+    padding: 0.5rem;
+    background-color: var(--branco-gelo);
+    margin-bottom: 0.5rem;
+}
+
+
+label{
+    font-size: 0.8125rem;
+    padding: 0.5rem 0;
+    margin: 0;
+    color: var(--cinza-escuro-forte);
+}
+/*confiança */
+
+
+.confiança {
+    display: flex;
+    gap: 0.3rem;
+     color: var(--laranja-principal);
+
+}
+
+.confiança .cards {
+    width: 400px;
+    height: 150px;
+    padding: 0.5rem;
+    border-radius: 10px;
+    justify-self: center;
+    border: 0.001rem solid var(--cinza-claro);
+    box-shadow: 0 2px 2px var(--cinza-escuro-suave);
+    display: flex;
+    align-items: center;
+    text-align: center;
+    background-color: var(--branco);
+   
+
+}
+
+.cards {
+ display: flex;
+ flex-direction: column;
+ gap: 1rem;
+}
+
+.cards h1 {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.cards p {
+    font-size: 0.6rem;
+    font-weight: bold;
+}
+
+/* Instituição financeira */
+
+.instituicao {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.instituicao label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--cinza-escuro-forte);
+}
+
+.select-container {
+    width: 100%;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+
+    border: 1px solid var(--cinza-claro);
+    border-radius: 8px;
+
+    padding: 0 12px;
+    background-color: var(--branco);
+}
+
+.icone-banco {
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.select-container select {
+    flex: 1;
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    font-size: 0.75rem;
+    color: var(--cinza-escuro-suave);
+
+    cursor: pointer;
+
+    appearance: none;
+}
+
+.seta {
+    font-size: 1.2rem;
+    color: var(--cinza-escuro-suave);
+    pointer-events: none;
+}
+
+.descricao-instituicao {
+    font-size: 0.65rem;
+    line-height: 1.5;
+    color: var(--cinza-escuro-suave);
+}
+
+/* botão de login */
+
+.button-login{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.button-login button {
+  width: 100%;
+  height: 48px;
+  padding: 0.55rem;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--laranja-principal);
+  color: var(--branco);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button-login a {
+    color: var(--roxo);
+    font-size: 0.5;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+
+img {
+    width: 50px;
+    height: 100px;
+    object-fit: contain;
+}
+
+footer {
+    border-top: 1px solid var(--branco-gelo);
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--cinza-escuro-suave);
+}
+.login-card footer {
+    padding-top: 1rem;
+}
+
+footer a {
+    color: var(--laranja-principal);
+    text-decoration: none;
+}
