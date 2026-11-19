@@ -31,6 +31,13 @@ export const routes: Routes = [
         .then((m) => m.Verificacao2FatoresC)
   },
 
+ {
+    path:'verificacao-2-fatores-c2',
+    loadComponent:() =>
+        import('./pages/verificacao-2-fatores-c2/verificacao-2-fatores-c2')
+        .then((m) => m.Verificacao2FatoresC2)
+  },
+
   {
     path: '',
     redirectTo: 'login',
