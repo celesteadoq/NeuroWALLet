@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, afterNextRender } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { mensagemDeErro } from '../../core/erros';
@@ -28,6 +28,14 @@ export class Login {
   });
 
   constructor() {
+    afterNextRender(() =>
+      this.authService.sessao().subscribe({
+        next: (s) => {
+          if (s.autenticado) void this.router.navigateByUrl('/inicio');
+        },
+        error: () => {},
+      }),
+    );
     if (typeof localStorage !== 'undefined') {
       const email = localStorage.getItem('nw-email');
       if (email) this.form.patchValue({ email, lembrar: true });

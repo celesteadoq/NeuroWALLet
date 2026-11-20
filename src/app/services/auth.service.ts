@@ -28,7 +28,7 @@ export class AuthService {
       })
       .pipe(
         timeout(20000),
-        tap((r) => this.local.desafio(r.tokenPre2fa, r.configurarTotp)),
+        tap((r) => this.local.desafio(r.tokenPre2fa, r.configurarTotp, pedido.lembrar)),
         map((r) => ({ proximo: r.configurarTotp ? 'ativar-2fa' : 'verificar-2fa' })),
       );
   }
@@ -61,6 +61,9 @@ export class AuthService {
   sair(): Observable<void> {
     return this.http
       .post<void>(this.base + '/logout', { refreshToken: this.local.refreshToken })
-      .pipe(finalize(() => this.local.limpar()));
+      .pipe(
+        timeout(20000),
+        finalize(() => this.local.limpar()),
+      );
   }
 }
