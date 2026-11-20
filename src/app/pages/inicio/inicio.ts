@@ -17,6 +17,7 @@ export class Inicio {
   private readonly auth = inject(AuthService);
   private readonly banco = inject(BancoService);
   private readonly http = inject(HttpClient);
+  protected readonly menuAberto = signal(false);
   protected readonly aba = signal('visao');
   protected readonly sincronizando = signal<number | null>(null);
   protected readonly menu = [

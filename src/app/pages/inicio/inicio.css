@@ -464,3 +464,80 @@ a:focus-visible {
     scrollbar-width: thin;
   }
 }
+
+.mobile-menu {
+  display: none;
+}
+@media (max-width: 760px) {
+  .sidebar {
+    position: relative;
+  }
+  .mobile-menu {
+    display: block;
+    position: absolute;
+    right: 18px;
+    top: 20px;
+    background: #f7edf5;
+    color: #963483;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+  }
+  nav {
+    display: none;
+  }
+  nav.open {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+  nav button {
+    white-space: normal;
+  }
+  .brand {
+    padding-right: 90px;
+  }
+  .brand img {
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 480px) {
+  .profile {
+    display: none;
+  }
+  header > span {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .page-heading {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .page-heading > button {
+    align-self: flex-start;
+  }
+  .panel-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .bank-row .secondary {
+    width: 100%;
+  }
+  .metrics strong {
+    font-size: 22px;
+  }
+}
+@media (max-width: 350px) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+  .welcome {
+    padding: 22px;
+  }
+  .welcome h2 {
+    font-size: 24px;
+  }
+}

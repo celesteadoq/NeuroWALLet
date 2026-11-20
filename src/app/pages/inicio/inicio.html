@@ -4,12 +4,20 @@
       ><img src="/images/Logo.png" alt="" />NeuroWALLet<span>FINANÇAS COM CONSCIÊNCIA</span></a
     >
     <p class="nav-label">SEU ESPAÇO</p>
-    <nav aria-label="Menu principal">
+    <button
+      class="mobile-menu"
+      (click)="menuAberto.set(!menuAberto())"
+      [attr.aria-expanded]="menuAberto()"
+      aria-controls="menu-principal"
+    >
+      {{ menuAberto() ? 'Fechar ✕' : 'Menu ☰' }}
+    </button>
+    <nav id="menu-principal" [class.open]="menuAberto()" aria-label="Menu principal">
       @for (item of menu; track item.id) {
         <button
           [class.active]="aba() === item.id"
           [attr.aria-current]="aba() === item.id ? 'page' : null"
-          (click)="aba.set(item.id)"
+          (click)="aba.set(item.id); menuAberto.set(false)"
         >
           <span>{{ item.icone }}</span>{{ item.nome }}
         </button>
