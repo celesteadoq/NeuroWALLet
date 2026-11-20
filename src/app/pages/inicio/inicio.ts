@@ -17,6 +17,7 @@ import {
   Parametros,
   Loja,
   Excecao,
+  Importacao,
 } from '../../services/painel.service';
 import { mensagemDeErro } from '../../core/erros';
 @Component({
@@ -41,6 +42,7 @@ export class Inicio {
   protected readonly saude = signal('Aguardando consulta');
   protected readonly contas = signal<Conta[]>([]);
   protected readonly gastos = signal<Pagina | null>(null);
+  protected readonly importacao = signal<Importacao | null>(null);
   protected readonly alertas = signal<Alerta[]>([]);
   protected readonly faturas = signal<Fatura[]>([]);
   protected readonly selos = signal<Selo[]>([]);
@@ -180,6 +182,11 @@ export class Inicio {
     this.erros.set({});
     const tarefas = [
       {
+        id: 'importacao',
+        obs: this.api.get<Importacao>('/painel/importacao'),
+        set: (r: Importacao) => this.importacao.set(r),
+      },
+      {
         id: 'gastos',
         obs: this.api.get<Pagina>('/painel/ralos?tamanho=100'),
         set: (r: Pagina) => this.gastos.set(r),
@@ -279,6 +286,19 @@ export class Inicio {
           );
         },
       });
+  }
+  protected analisar() {
+    if (this.ocupado()) return;
+    this.ocupado.set(true);
+    this.api.analisar().pipe(finalize(() => this.ocupado.set(false))).subscribe({
+      next: (r) => {
+        this.carregar();
+        this.aviso.set(r.pendentes > 0
+          ? 'Há transações aguardando classificação. Aguarde e atualize a análise novamente.'
+          : 'Análise atualizada. Os padrões encontrados aparecem em Ralos Invisíveis.');
+      },
+      error: (e) => this.aviso.set(mensagemDeErro(e, 'Não foi possível atualizar a análise.')),
+    });
   }
   protected salvarRegra() {
     if (this.ocupado()) return;

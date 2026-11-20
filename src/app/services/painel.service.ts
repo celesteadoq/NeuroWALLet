@@ -19,6 +19,12 @@ export interface Pagina {
   tamanho: number;
   temProxima: boolean;
 }
+export interface Importacao {
+  importadas: number;
+  classificadas: number;
+  pendentes: number;
+  foraDaAnalise: number;
+}
 export interface Alerta {
   id: number;
   mensagem: string;
@@ -58,6 +64,9 @@ export interface Excecao {
 @Injectable({ providedIn: 'root' })
 export class PainelService {
   private readonly http = inject(HttpClient);
+  analisar() {
+    return this.http.post<Importacao>('/api/painel/analisar', {}).pipe(timeout(20000));
+  }
   get<T>(rota: string) {
     return this.http.get<T>('/api' + rota).pipe(timeout(20000));
   }

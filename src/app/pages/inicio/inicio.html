@@ -78,6 +78,18 @@
     }
     @switch (aba()) {
       @case ('inicio') {
+        <section class="card">
+          <h2>Histórico importado</h2>
+          @if (importacao(); as r) {
+            <p><strong>{{ r.importadas }} transações importadas</strong> · {{ r.classificadas }} classificadas · {{ r.pendentes }} aguardando classificação · {{ r.foraDaAnalise }} fora da análise</p>
+            <p class="detail">O total importado inclui todos os lançamentos. Ralos Invisíveis mostra apenas compras que formam padrões nas suas regras.</p>
+            @if (r.importadas > 0 && r.classificadas === 0 && r.pendentes === 0) {
+              <p>Nenhuma compra passou pelos filtros de análise. Os lançamentos foram importados, mas não geram padrões de consumo.</p>
+            }
+            <button class="secondary" (click)="analisar()" [disabled]="ocupado() || r.classificadas === 0">Atualizar análise</button>
+          }
+          @if (erros()['importacao']) { <p class="error">{{ erros()['importacao'] }}</p> }
+        </section>
         <div class="dashboard-grid">
           <div class="column">
             <section class="card">
