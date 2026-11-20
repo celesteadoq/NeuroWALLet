@@ -4,11 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { BancoService, Conta } from '../../services/banco.service';
+import { finalize } from 'rxjs';
 import { API } from '../../core/config';
 @Component({
   imports: [RouterLink, CurrencyPipe, DatePipe],
   selector: 'app-inicio',
-  styleUrls: ['../auth-base.css', './inicio.css'],
+  styleUrls: ['./inicio.css'],
   templateUrl: './inicio.html',
 })
 export class Inicio {
@@ -16,6 +17,26 @@ export class Inicio {
   private readonly auth = inject(AuthService);
   private readonly banco = inject(BancoService);
   private readonly http = inject(HttpClient);
+  protected readonly aba = signal('visao');
+  protected readonly sincronizando = signal<number | null>(null);
+  protected readonly menu = [
+    { id: 'visao', nome: 'Visão geral', icone: '◈' },
+    { id: 'contas', nome: 'Minhas contas', icone: '▣' },
+    { id: '/painel/ralos', nome: 'Meus gastos', icone: '↗' },
+    { id: '/alertas', nome: 'Alertas', icone: '◉' },
+    { id: '/faturas/projecao', nome: 'Faturas', icone: '▤' },
+    { id: '/gamificacao/selos', nome: 'Conquistas', icone: '✧' },
+    { id: '/relatorios', nome: 'Relatórios', icone: '▥' },
+  ];
+  protected titulo() {
+    return this.menu.find((i) => i.id === this.aba())?.nome ?? 'Visão geral';
+  }
+  protected total() {
+    return (this.dados()['/painel/ralos']?.resultados ?? []).reduce(
+      (s: number, l: { total: number }) => s + Number(l.total),
+      0,
+    );
+  }
   protected readonly contas = signal<Conta[]>([]);
   protected readonly aviso = signal('');
   protected readonly secoes = [
@@ -47,18 +68,23 @@ export class Inicio {
       });
   }
   protected sincronizar(id: number) {
+    if (this.sincronizando() !== null) return;
+    this.sincronizando.set(id);
     this.aviso.set('Importando transações...');
-    this.banco.sincronizar(id).subscribe({
-      next: (r) => {
-        this.aviso.set(
-          r.novasTransacoes +
-            ' novas transações importadas. A análise pode levar alguns instantes.',
-        );
-        this.carregar();
-      },
-      error: () =>
-        this.aviso.set('Não foi possível importar. Confira a conexão e o limite diário.'),
-    });
+    this.banco
+      .sincronizar(id)
+      .pipe(finalize(() => this.sincronizando.set(null)))
+      .subscribe({
+        next: (r) => {
+          this.aviso.set(
+            r.novasTransacoes +
+              ' novas transações importadas. A análise pode levar alguns instantes.',
+          );
+          this.carregar();
+        },
+        error: () =>
+          this.aviso.set('Não foi possível importar. Confira a conexão e o limite diário.'),
+      });
   }
   protected sair() {
     this.auth.sair().subscribe({

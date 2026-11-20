@@ -31,4 +31,6 @@ O build gera dist/neuro-wallet. As páginas são renderizadas no cliente para ma
 
 O proxy do ng serve é usado apenas durante desenvolvimento. Se hospedar somente os arquivos estáticos, configure o servidor de hospedagem para encaminhar /api/** ao backend e retornar index.html para as rotas do Angular.
 
-Termos de uso e política de privacidade continuam como páginas em construção, aguardando conteúdo da equipe.
+O painel possui navegação por contas, gastos, alertas, faturas, conquistas e relatórios. Termos de uso e política de privacidade possuem páginas próprias com texto de exemplo para revisão da equipe; responsável pelos dados, canal de contato e retenção ainda devem ser definidos antes da disponibilização pública.
+
+A autenticação permite nova tentativa após erro, informa limites de requisições e possui tempo limite de rede. Os testes cobrem código incorreto, excesso de tentativas, sessão expirada e prevenção de envios duplicados.

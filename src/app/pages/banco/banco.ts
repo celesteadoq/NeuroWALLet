@@ -21,8 +21,17 @@ function carregar(): Promise<void> {
   return (carregamento ??= new Promise<void>((resolve, reject) => {
     const script = document.createElement('script');
     script.src = 'https://cdn.pluggy.ai/pluggy-connect/v2.8.2/pluggy-connect.js';
-    script.onload = () => resolve();
+    const timer = setTimeout(() => {
+      carregamento = undefined;
+      script.remove();
+      reject(new Error('Tempo excedido'));
+    }, 15000);
+    script.onload = () => {
+      clearTimeout(timer);
+      resolve();
+    };
     script.onerror = () => {
+      clearTimeout(timer);
       carregamento = undefined;
       script.remove();
       reject(new Error('Falha ao carregar Pluggy'));
@@ -69,7 +78,7 @@ export class Banco {
         this.erro.set(
           mensagemDeErro(
             e,
-            'Não foi possível iniciar a conexão. Confira a configuração Pluggy no servidor.',
+            'Não foi possível iniciar a conexão agora. Tente novamente em instantes.',
           ),
         );
         this.enviando.set(false);

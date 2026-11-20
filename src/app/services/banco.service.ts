@@ -1,4 +1,4 @@
-import { switchMap, tap } from 'rxjs';
+import { switchMap, tap, timeout } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { API } from '../core/config';
@@ -10,7 +10,7 @@ export interface Conta {
 export class BancoService {
   private readonly http = inject(HttpClient);
   listar() {
-    return this.http.get<Conta[]>(API.baseUrl + '/contas');
+    return this.http.get<Conta[]>(API.baseUrl + '/contas').pipe(timeout(20000));
   }
   iniciarConexao() {
     return this.listar().pipe(
