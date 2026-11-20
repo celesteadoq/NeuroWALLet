@@ -16,19 +16,24 @@ export class Verificacao2FatoresL {
   private readonly authService = inject(AuthService);
   private readonly campoCodigo = viewChild.required(CodigoVerificacao);
 
+  protected readonly codigoReserva = signal('');
+  protected readonly recuperacao = signal<string[]>([]);
   protected readonly codigo = signal('');
   protected readonly enviando = signal(false);
   protected readonly erro = signal<string | null>(null);
 
   protected verificarCodigo(): void {
-    if (this.codigo().length !== 6 || this.enviando()) return;
+    if ((!this.codigoReserva().trim() && this.codigo().length !== 6) || this.enviando()) return;
 
     this.enviando.set(true);
     this.erro.set(null);
 
-    this.authService.verificar2fa(this.codigo()).subscribe({
+    this.authService.verificar2fa(this.codigoReserva().trim() || this.codigo()).subscribe({
       // Ativação e login passam por aqui: o back diz para onde ir em cada caso.
-      next: ({ proximo }) => this.router.navigateByUrl(ROTA_POR_PASSO[proximo]),
+      next: ({ codigosRecuperacao }) => {
+        if (codigosRecuperacao.length) this.recuperacao.set(codigosRecuperacao);
+        else void this.router.navigateByUrl('/inicio');
+      },
       error: (erro) => {
         this.enviando.set(false);
         this.erro.set(mensagemDeErro(erro, 'Código incorreto ou expirado. Tente novamente.'));

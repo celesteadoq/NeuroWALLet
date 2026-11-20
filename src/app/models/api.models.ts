@@ -5,11 +5,7 @@
 
 /** O back-end decide qual é o próximo passo do usuário; o front só traduz isso em rota. */
 export type ProximoPasso =
-  | 'verificar-email'
-  | 'ativar-2fa'
-  | 'verificar-2fa'
-  | 'conectar-banco'
-  | 'inicio';
+  'verificar-email' | 'ativar-2fa' | 'verificar-2fa' | 'conectar-banco' | 'inicio';
 
 export interface PassoResposta {
   proximo: ProximoPasso;
@@ -25,6 +21,7 @@ export interface CadastroPedido {
   nome: string;
   email: string;
   senha: string;
+  consentimentoLgpd: boolean;
 }
 
 export interface Iniciar2faResposta {
@@ -32,6 +29,7 @@ export interface Iniciar2faResposta {
   chave: string;
   /** Endereço otpauth:// para montar o QR code (opcional). */
   otpauthUrl: string;
+  qrPngBase64?: string;
 }
 
 export interface SessaoResposta {

@@ -18,7 +18,7 @@ export function mensagemDeErro(
   if (erro.status === 0) return SEM_CONEXAO;
   if (usarMensagemDoServidor) {
     const corpo = erro.error as Partial<ErroApi> | null;
-    return corpo?.mensagem ?? padrao;
+    return corpo?.mensagem ?? (erro.error?.detail as string | undefined) ?? padrao;
   }
   return padrao;
 }

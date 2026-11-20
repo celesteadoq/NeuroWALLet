@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { mensagemDeErro } from '../../core/erros';
 import { ROTA_POR_PASSO } from '../../core/rotas';
 import { AuthService } from '../../services/auth.service';
@@ -15,6 +15,8 @@ export class Login {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
+  protected readonly cadastroRecebido =
+    inject(ActivatedRoute).snapshot.queryParamMap.get('cadastro') === 'recebido';
   protected readonly enviando = signal(false);
   protected readonly erro = signal<string | null>(null);
 

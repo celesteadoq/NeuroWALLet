@@ -1,3 +1,5 @@
+import { request as httpRequest } from 'node:http';
+import { request as httpsRequest } from 'node:https';
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -11,6 +13,25 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+const apiOrigin = new URL(process.env['API_TARGET'] || 'http://127.0.0.1:8080');
+app.use('/api', (req, res) => {
+  const target = new URL(req.originalUrl, apiOrigin);
+  const upstream = (target.protocol === 'https:' ? httpsRequest : httpRequest)(
+    target,
+    { method: req.method, headers: { ...req.headers, host: target.host } },
+    (incoming) => {
+      res.writeHead(incoming.statusCode || 502, incoming.headers);
+      incoming.pipe(res);
+    },
+  );
+  upstream.setTimeout(30000, () => upstream.destroy(new Error('Timeout')));
+  upstream.on('error', () => {
+    if (!res.headersSent) res.status(502).json({ detail: 'API indisponível' });
+    else res.destroy();
+  });
+  req.on('aborted', () => upstream.destroy());
+  req.pipe(upstream);
+});
 
 /**
  * Example Express Rest API endpoints can be defined here.
@@ -41,9 +62,7 @@ app.use(
 app.use((req, res, next) => {
   angularApp
     .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
+    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
     .catch(next);
 });
 

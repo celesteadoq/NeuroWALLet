@@ -4,7 +4,7 @@ import {
   FormBuilder,
   ReactiveFormsModule,
   ValidatorFn,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { mensagemDeErro } from '../../core/erros';
@@ -38,15 +38,15 @@ export class Cadastro {
 
   protected readonly form = inject(FormBuilder).nonNullable.group(
     {
-      nome: ['', Validators.required],
+      nome: ['', [Validators.required, Validators.maxLength(120)]],
       email: ['', [Validators.required, Validators.email]],
       confirmar: ['', Validators.required],
       termos: [false, Validators.requiredTrue],
-      senha: ['', [Validators.required, Validators.minLength(8)]],
+      senha: ['', [Validators.required, Validators.minLength(12), Validators.maxLength(72)]],
     },
     {
       validators: senhasIguais,
-    }
+    },
   );
 
   protected campoInvalido(nome: 'nome' | 'email' | 'senha' | 'confirmar'): boolean {
@@ -64,16 +64,20 @@ export class Cadastro {
     this.enviando.set(true);
     this.erro.set(null);
 
-    // Só os campos que o back precisa: a confirmação e os termos ficam no front.
+    // O consentimento explícito acompanha o cadastro.
     const { nome, email, senha } = this.form.getRawValue();
 
-    this.authService.cadastrar({ nome, email, senha }).subscribe({
-      next: ({ proximo }) => this.router.navigateByUrl(ROTA_POR_PASSO[proximo]),
-      error: (erro) => {
-        this.enviando.set(false);
-        // Aqui a mensagem do servidor é segura ("e-mail já cadastrado").
-        this.erro.set(mensagemDeErro(erro, 'Não foi possível criar a conta. Tente novamente.', true));
-      },
-    });
+    this.authService
+      .cadastrar({ nome, email, senha, consentimentoLgpd: this.form.controls.termos.value })
+      .subscribe({
+        next: () => this.router.navigateByUrl('/login?cadastro=recebido'),
+        error: (erro) => {
+          this.enviando.set(false);
+
+          this.erro.set(
+            mensagemDeErro(erro, 'Não foi possível criar a conta. Tente novamente.', true),
+          );
+        },
+      });
   }
 }

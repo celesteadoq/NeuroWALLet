@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map, tap, finalize, of } from 'rxjs';
 import { API } from '../core/config';
 import {
   CadastroPedido,
@@ -9,41 +9,51 @@ import {
   PassoResposta,
   SessaoResposta,
 } from '../models/api.models';
-
+import { SessaoService } from './sessao.service';
+export interface Tokens {
+  accessToken: string;
+  refreshToken: string;
+  codigosRecuperacao: string[];
+}
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly base = `${API.baseUrl}/auth`;
-
+  private readonly local = inject(SessaoService);
+  private readonly base = API.baseUrl + '/auth';
   login(pedido: LoginPedido): Observable<PassoResposta> {
-    return this.http.post<PassoResposta>(`${this.base}/login`, pedido);
+    return this.http
+      .post<{ tokenPre2fa: string; configurarTotp: boolean }>(this.base + '/login', {
+        email: pedido.email,
+        senha: pedido.senha,
+      })
+      .pipe(
+        tap((r) => this.local.desafio(r.tokenPre2fa, r.configurarTotp)),
+        map((r) => ({ proximo: r.configurarTotp ? 'ativar-2fa' : 'verificar-2fa' })),
+      );
   }
-
-  cadastrar(pedido: CadastroPedido): Observable<PassoResposta> {
-    return this.http.post<PassoResposta>(`${this.base}/cadastro`, pedido);
+  cadastrar(pedido: CadastroPedido): Observable<void> {
+    return this.http.post<void>(this.base + '/cadastro', pedido);
   }
-
-  verificarEmail(codigo: string): Observable<PassoResposta> {
-    return this.http.post<PassoResposta>(`${this.base}/email/verificar`, { codigo });
-  }
-
-  reenviarEmail(): Observable<void> {
-    return this.http.post<void>(`${this.base}/email/reenviar`, {});
-  }
-
   iniciar2fa(): Observable<Iniciar2faResposta> {
-    return this.http.post<Iniciar2faResposta>(`${this.base}/2fa/iniciar`, {});
+    return this.http
+      .post<{ segredo: string; qrPngBase64: string }>(this.base + '/2fa/ativar', {})
+      .pipe(map((r) => ({ chave: r.segredo, otpauthUrl: '', qrPngBase64: r.qrPngBase64 })));
   }
-
-  verificar2fa(codigo: string): Observable<PassoResposta> {
-    return this.http.post<PassoResposta>(`${this.base}/2fa/verificar`, { codigo });
+  verificar2fa(codigo: string): Observable<Tokens> {
+    return this.http
+      .post<Tokens>(this.base + '/2fa/' + (this.local.configurar ? 'confirmar' : 'verificar'), {
+        codigo,
+      })
+      .pipe(tap((r) => this.local.salvar(r)));
   }
-
   sessao(): Observable<SessaoResposta> {
-    return this.http.get<SessaoResposta>(`${this.base}/sessao`);
+    return this.local.accessToken
+      ? this.http.get(API.baseUrl + '/usuario/me').pipe(map(() => ({ autenticado: true })))
+      : of({ autenticado: false });
   }
-
   sair(): Observable<void> {
-    return this.http.post<void>(`${this.base}/sair`, {});
+    return this.http
+      .post<void>(this.base + '/logout', { refreshToken: this.local.refreshToken })
+      .pipe(finalize(() => this.local.limpar()));
   }
 }

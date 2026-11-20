@@ -1,82 +1,86 @@
-<main> 
-    <div class="login-card">
-        
-         <div class="titulo">
-            <div class="titulo-texto">
-            <h1>Bem vindo ao NeuroWallet</h1>
-            <p class="subtitulo">Prazer em vê-lo</p>
-            </div>
-            <img src="./images/Logo.png" alt="logo NeuroWallet" />
-            </div>
+<main>
+  @if (cadastroRecebido) {
+    <p role="status">Solicitação de cadastro recebida. Entre com seu e-mail e senha.</p>
+  }
+  <div class="login-card">
+    <div class="titulo">
+      <div class="titulo-texto">
+        <h1>Bem vindo ao NeuroWallet</h1>
+        <p class="subtitulo">Prazer em vê-lo</p>
+      </div>
+      <img src="./images/Logo.png" alt="logo NeuroWallet" />
+    </div>
 
-        <form [formGroup]="form" (ngSubmit)="entrar()" novalidate>
-            <div class="input">
-                <label for="email">E-Mail</label>
-                <input
-                      id="email"
-                      type="email"
-                      placeholder="Digite seu e-mail"
-                      formControlName="email"
-                      autocomplete="email"
-                      [attr.aria-invalid]="campoInvalido('email')"
-                    />
-                @if (campoInvalido('email')) {
-                    <p class="erro" role="alert">Informe um e-mail válido.</p>
-                }
-            </div>
-            
-            <div class="input">
-                <label for="senha">Senha</label>
-                <input
-                  id="senha"
-                  type="password"
-                  placeholder="Digite sua senha"
-                  formControlName="senha"
-                  autocomplete="current-password"
-                  [attr.aria-invalid]="campoInvalido('senha')"
-                />
-                @if (campoInvalido('senha')) {
-                    <p class="erro" role="alert">Informe sua senha.</p>
-                }
-            </div>
-
-        @if (erro()) {
-            <p class="erro" role="alert">{{ erro() }}</p>
+    <form [formGroup]="form" (ngSubmit)="entrar()" novalidate>
+      <div class="input">
+        <label for="email">E-Mail</label>
+        <input
+          id="email"
+          type="email"
+          placeholder="Digite seu e-mail"
+          formControlName="email"
+          autocomplete="email"
+          [attr.aria-invalid]="campoInvalido('email')"
+        />
+        @if (campoInvalido('email')) {
+          <p class="erro" role="alert">Informe um e-mail válido.</p>
         }
+      </div>
 
-        <div class="button-login">
-            <button type="submit" [disabled]="enviando()">
-            {{ enviando() ? 'Entrando...' : 'Login' }}
-            </button>
-        </div>
+      <div class="input">
+        <label for="senha">Senha</label>
+        <input
+          id="senha"
+          type="password"
+          placeholder="Digite sua senha"
+          formControlName="senha"
+          autocomplete="current-password"
+          [attr.aria-invalid]="campoInvalido('senha')"
+        />
+        @if (campoInvalido('senha')) {
+          <p class="erro" role="alert">Informe sua senha.</p>
+        }
+      </div>
 
-    <div class="opcoes">
-        <label class="lembrar">
-          <input type="checkbox" formControlName="lembrar" />
-          <span>Lembrar de mim</span>
-        </label>
+      @if (erro()) {
+        <p class="erro" role="alert">{{ erro() }}</p>
+      }
+
+      <div class="button-login">
+        <button type="submit" [disabled]="enviando()">
+          {{ enviando() ? 'Entrando...' : 'Login' }}
+        </button>
+      </div>
+
+      <div class="opcoes">
         <a class="link" routerLink="/recuperar-senha">Esqueci minha senha</a>
       </div>
 
       <div class="button-criar">
-          <p class="subtitulo">ainda não tem uma conta?</p>
+        <p class="subtitulo">ainda não tem uma conta?</p>
 
-          <a routerLink="/cadastro">
-              Criar conta
-          </a>
+        <a routerLink="/cadastro"> Criar conta </a>
       </div>
     </form>
-     <footer class="login-footer">
-
+    <footer class="login-footer">
       <p>
         Protegido por reCAPTCHA
-        <a href="https://policies.google.com/privacy?hl=pt&client_theme=dark" target="_blank" rel="noopener">Privacidade</a> e
-        <a href="https://policies.google.com/terms?hl=pt&client_theme=dark" target="_blank" rel="noopener">Termos do Google</a>.
+        <a
+          href="https://policies.google.com/privacy?hl=pt&client_theme=dark"
+          target="_blank"
+          rel="noopener"
+          >Privacidade</a
+        >
+        e
+        <a
+          href="https://policies.google.com/terms?hl=pt&client_theme=dark"
+          target="_blank"
+          rel="noopener"
+          >Termos do Google</a
+        >.
       </p>
 
-      <p>
-        Dados tratados conforme a LGPD, veja nossa política.
-      </p>
+      <p>Dados tratados conforme a LGPD, veja nossa política.</p>
 
       <div class="footer-links">
         <a routerLink="/politica-de-privacidade">Política de Privacidade</a>

@@ -1,53 +1,65 @@
-<main> 
-    <div class="login-card">
-        
-         <div class="titulo">
-            <div class="titulo-texto">
-            <h1>Bem vindo ao NeuroWallet</h1>
-            <p class="subtitulo">Segurança da sua conta</p>
-            </div>
-            <img src="./images/Logo.png" alt="logo NeuroWallet" />
-            </div>
-
-            <div class="titulo-especifico">
-                <label>Etapa 3 de 3  •  Confirmação</label>
-                <h1>Confirme seu autenticador</h1>
-                <p class="subtitulo">Abra o aplicativo autenticador e digite o código
-                    de 6 dígitos da sua conta NeuroWALLet.</p>
-            </div>
-
- <form class="form" (submit)="$event.preventDefault(); verificarCodigo()">
-
-      <div class="verification-container">
-
-        <label>Código de verificação</label>
-
-        <app-codigo-verificacao (alterado)="codigo.set($event)" />
-
-        @if (erro()) {
-          <p class="erro" role="alert">{{ erro() }}</p>
-        }
-
-        <small>O código é renovado a cada 30 segundos.</small>
-
+<main>
+  <div class="login-card">
+    <div class="titulo">
+      <div class="titulo-texto">
+        <h1>Bem vindo ao NeuroWallet</h1>
+        <p class="subtitulo">Segurança da sua conta</p>
       </div>
-
-      <div class="button-login">
-        <button type="submit" [disabled]="codigo().length < 6 || enviando()">
-          {{ enviando() ? 'Verificando...' : 'Verificar e ativar 2FA' }}
-        </button>
-
-        <p>O 2FA será ativado após a confirmação do código.</p>
-      </div>
-
-    </form>
-
-    
-    <div class="voltinha">
-        <p>O código não funcionou? Aguarde o próximo e tente de novo.</p>
-        <a routerLink="/login"> voltar</a>
+      <img src="./images/Logo.png" alt="logo NeuroWallet" />
     </div>
-        
-        
+
+    <div class="titulo-especifico">
+      <label>Etapa 3 de 3 • Confirmação</label>
+      <h1>Confirme seu autenticador</h1>
+      <p class="subtitulo">
+        Abra o aplicativo autenticador e digite o código de 6 dígitos da sua conta NeuroWALLet.
+      </p>
+    </div>
+
+    @if (recuperacao().length) {
+      <section role="status">
+        <h2>Guarde seus códigos de recuperação</h2>
+        <p>Cada código pode ser usado uma única vez.</p>
+        @for (codigo of recuperacao(); track codigo) {
+          <p>
+            <code>{{ codigo }}</code>
+          </p>
+        }
+        <a routerLink="/inicio">Já guardei, continuar</a>
+      </section>
+    } @else {
+      <form class="form" (submit)="$event.preventDefault(); verificarCodigo()">
+        <div class="verification-container">
+          <label>Código de verificação</label>
+
+          <app-codigo-verificacao (alterado)="codigo.set($event)" />
+
+          @if (erro()) {
+            <p class="erro" role="alert">{{ erro() }}</p>
+          }
+
+          <label
+            >Ou código de recuperação
+            <input #reserva (input)="codigoReserva.set(reserva.value)" autocomplete="off" /></label
+          ><small>O código é renovado a cada 30 segundos.</small>
+        </div>
+
+        <div class="button-login">
+          <button
+            type="submit"
+            [disabled]="(!codigoReserva().trim() && codigo().length < 6) || enviando()"
+          >
+            {{ enviando() ? 'Verificando...' : 'Verificar e ativar 2FA' }}
+          </button>
+
+          <p>O 2FA será ativado após a confirmação do código.</p>
+        </div>
+      </form>
+    }
+
+    <div class="voltinha">
+      <p>O código não funcionou? Aguarde o próximo e tente de novo.</p>
+      <a routerLink="/login"> voltar</a>
+    </div>
   </div>
 </main>

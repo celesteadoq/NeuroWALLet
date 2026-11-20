@@ -42,8 +42,7 @@ export const routes: Routes = [
   {
     path: 'banco/retorno',
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('./pages/banco-retorno/banco-retorno').then((m) => m.BancoRetorno),
+    loadComponent: () => import('./pages/banco-retorno/banco-retorno').then((m) => m.BancoRetorno),
   },
   {
     path: 'banco/conectado',
@@ -66,20 +65,22 @@ export const routes: Routes = [
   {
     path: 'termos-de-uso',
     data: { titulo: 'Termos de Uso' },
-    loadComponent: () =>
-      import('./pages/em-construcao/em-construcao').then((m) => m.EmConstrucao),
+    loadComponent: () => import('./pages/em-construcao/em-construcao').then((m) => m.EmConstrucao),
   },
   {
     path: 'politica-de-privacidade',
     data: { titulo: 'Política de Privacidade' },
-    loadComponent: () =>
-      import('./pages/em-construcao/em-construcao').then((m) => m.EmConstrucao),
+    loadComponent: () => import('./pages/em-construcao/em-construcao').then((m) => m.EmConstrucao),
   },
   {
     path: 'recuperar-senha',
-    data: { titulo: 'Recuperar senha' },
     loadComponent: () =>
-      import('./pages/em-construcao/em-construcao').then((m) => m.EmConstrucao),
+      import('./pages/recuperar-senha/recuperar-senha').then((m) => m.RecuperarSenha),
+  },
+  {
+    path: 'redefinir-senha',
+    loadComponent: () =>
+      import('./pages/recuperar-senha/recuperar-senha').then((m) => m.RecuperarSenha),
   },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },

@@ -1,78 +1,88 @@
-<main> 
-    <div class="login-card">
-        
-         <div class="titulo">
-            <div class="titulo-texto">
-            <h1>Bem vindo ao NeuroWallet</h1>
-            <p class="subtitulo">Segurança da sua conta</p>
-            </div>
-            <img src="./images/Logo.png" alt="logo NeuroWallet" />
-            </div>
+<main>
+  <div class="login-card">
+    <div class="titulo">
+      <div class="titulo-texto">
+        <h1>Bem vindo ao NeuroWallet</h1>
+        <p class="subtitulo">Segurança da sua conta</p>
+      </div>
+      <img src="./images/Logo.png" alt="logo NeuroWallet" />
+    </div>
 
-            <div class="titulo-especifico">
-                <label>Etapa 2 de 3  •  Configuração</label>
-                <h1>Ative a autenticação em 2 etapas</h1>
-                <p class="subtitulo">Adicione uma camada extra de proteção à sua conta
-                    com um aplicativo autenticador.</p>
-            </div>
+    <div class="titulo-especifico">
+      <label>Etapa 2 de 3 • Configuração</label>
+      <h1>Ative a autenticação em 2 etapas</h1>
+      <p class="subtitulo">
+        Adicione uma camada extra de proteção à sua conta com um aplicativo autenticador.
+      </p>
+    </div>
 
-            <div class="detalhes">
+    <div class="detalhes">
+      <h1>1. Instale um aplicativo autenticador</h1>
+      <p class="subtitulo">Use o Google Authenticator, Authy ou 1Password no seu celular.</p>
 
-                <h1>1. Instale um aplicativo autenticador</h1>
-                <p class="subtitulo">Use o Google Authenticator, Authy ou 1Password
-                    no seu celular.</p>
+      <h1>2. Adicione sua conta no aplicativo</h1>
+      <p class="subtitulo">Escolha “Inserir chave de configuração” e use:</p>
+    </div>
 
-                <h1>2. Adicione sua conta no aplicativo</h1>
-                <p class="subtitulo">
-                    Escolha “Inserir chave de configuração” e use:
-                </p>
-            </div>
+    <div class="key-container">
+      @if (qr()) {
+        <img
+          [src]="'data:image/png;base64,' + qr()"
+          alt="QR do autenticador"
+          width="200"
+          height="200"
+        />
+      }
+      <div class="key-box">
+        <span class="key-text" id="key">
+          @if (chave()) {
+            {{ chaveFormatada() }}
+          } @else if (!erro()) {
+            Gerando chave...
+          }
+        </span>
 
-        <div class="key-container">
-            <div class="key-box">
-                <span class="key-text" id="key">
-                    @if (chave()) {
-                        {{ chaveFormatada() }}
-                    } @else if (!erro()) {
-                        Gerando chave...
-                    }
-                </span>
+        <button class="copy-button" type="button" (click)="copiarChave()" [disabled]="!chave()">
+          {{ copiado() ? 'Copiado!' : 'Copiar chave' }}
+        </button>
+      </div>
 
-                <button class="copy-button" type="button" (click)="copiarChave()" [disabled]="!chave()">
-                    {{ copiado() ? 'Copiado!' : 'Copiar chave' }}
-                </button>
-            </div>
+      @if (erro()) {
+        <p class="erro" role="alert">
+          {{ erro() }}
+          @if (!chave()) {
+            <button type="button" class="reenviar" (click)="carregarChave()">Tentar de novo</button>
+          }
+        </p>
+      }
 
-            @if (erro()) {
-                <p class="erro" role="alert">
-                    {{ erro() }}
-                    @if (!chave()) {
-                        <button type="button" class="reenviar" (click)="carregarChave()">Tentar de novo</button>
-                    }
-                </p>
-            }
+      <p class="security-text">Guarde esta chave em um local seguro. Não compartilhe.</p>
+    </div>
 
-            <p class="security-text">
-                Guarde esta chave em um local seguro. Não compartilhe.
-            </p>
-        </div>
-
-           
-        <div class="button-login">
-            <a class="butao" routerLink="/verificacao-2-fatores-l">
-            Continuar
-            </a>
-            <div class="voltinha">
-                <a routerLink="/login"> cancelar</a>
-            </div>
-        </div>
+    <div class="button-login">
+      <a class="butao" routerLink="/verificacao-2-fatores-l"> Continuar </a>
+      <div class="voltinha">
+        <a routerLink="/login"> cancelar</a>
+      </div>
+    </div>
 
     <div class="protegido">
-        <p>Protegido por reCAPTCHA (<a href="https://policies.google.com/privacy?hl=pt&client_theme=dark" target="_blank" rel="noopener">Privacidade</a> e 
-            <a href="https://policies.google.com/terms?hl=pt&client_theme=dark" target="_blank" rel="noopener">Termos</a> do Google). Dados tratados conforme a LGPD, veja nossa política.</p>
-
+      <p>
+        Protegido por reCAPTCHA (<a
+          href="https://policies.google.com/privacy?hl=pt&client_theme=dark"
+          target="_blank"
+          rel="noopener"
+          >Privacidade</a
+        >
+        e
+        <a
+          href="https://policies.google.com/terms?hl=pt&client_theme=dark"
+          target="_blank"
+          rel="noopener"
+          >Termos</a
+        >
+        do Google). Dados tratados conforme a LGPD, veja nossa política.
+      </p>
     </div>
-        
-        
   </div>
 </main>

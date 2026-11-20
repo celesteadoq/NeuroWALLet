@@ -13,13 +13,17 @@ export class Verificacao2FatoresC2 {
   private readonly authService = inject(AuthService);
 
   // A chave é gerada pelo back-end; o front só mostra e copia.
+  protected readonly qr = signal<string | null>(null);
   protected readonly chave = signal<string | null>(null);
   protected readonly erro = signal<string | null>(null);
   protected readonly copiado = signal(false);
 
   /** Exibe a chave em grupos de 4 letras (JBSW Y3DP ...), mas copia sem espaços. */
   protected readonly chaveFormatada = computed(
-    () => this.chave()?.match(/.{1,4}/g)?.join(' ') ?? '',
+    () =>
+      this.chave()
+        ?.match(/.{1,4}/g)
+        ?.join(' ') ?? '',
   );
 
   constructor() {
@@ -30,7 +34,10 @@ export class Verificacao2FatoresC2 {
   protected carregarChave(): void {
     this.erro.set(null);
     this.authService.iniciar2fa().subscribe({
-      next: ({ chave }) => this.chave.set(chave),
+      next: ({ chave, qrPngBase64 }) => {
+        this.chave.set(chave);
+        this.qr.set(qrPngBase64 ?? null);
+      },
       error: (erro) =>
         this.erro.set(mensagemDeErro(erro, 'Não foi possível gerar a chave. Tente novamente.')),
     });

@@ -1,60 +1,68 @@
-<main> 
-    <div class="login-card">
-        
-         <div class="titulo">
-            <div class="titulo-texto">
-            <h1>Bem vindo ao NeuroWallet</h1>
-            <p class="subtitulo">Segurança da sua conta</p>
-            </div>
-            <img src="./images/Logo.png" alt="logo NeuroWallet" />
-            </div>
-
-            <div class="titulo-especifico">
-                <label>Etapa 1 de 3  •  Confirmação</label>
-                <h1>Verifique seu Email</h1>
-                <p class="subtitulo">enviamos um codigo de 6 dígitos para seu email: 
-                   <span>exemplo@gmail.com</span></p>
-            </div>
-
-            <form class="form" (submit)="$event.preventDefault(); verificar()">
-
-                <div class="verification-container">
-
-                    <label>Código de verificação</label>
-
-                    <app-codigo-verificacao (alterado)="codigo.set($event)" />
-
-                    @if (erro()) {
-                        <p class="erro" role="alert">{{ erro() }}</p>
-                    }
-
-                    @if (segundos() > 0) {
-                        <small>Não recebeu o código? Reenviar em {{ segundos() }}s</small>
-                    } @else {
-                        <small>Não recebeu o código?
-                            <button type="button" class="reenviar" (click)="reenviar()">Reenviar código</button>
-                        </small>
-                    }
-
-                </div>
-
-                <div class="button-login">
-                    <button type="submit" [disabled]="codigo().length < 6 || enviando()">
-                    {{ enviando() ? 'Verificando...' : 'Verificar' }}
-                    </button>
-                    <div class="voltinha">
-                        <p>O código não funcionou? Aguarde o próximo e tente de novo.</p>
-                        <a routerLink="/login"> voltar</a>
-                    </div>
-                </div>
-
-            </form>
-    <div class="protegido">
-        <p>Protegido por reCAPTCHA (<a href="https://policies.google.com/privacy?hl=pt&client_theme=dark" target="_blank" rel="noopener">Privacidade</a> e 
-            <a href="https://policies.google.com/terms?hl=pt&client_theme=dark" target="_blank" rel="noopener">Termos</a> do Google). Dados tratados conforme a LGPD, veja nossa política.</p>
-
+<main>
+  <div class="login-card">
+    <div class="titulo">
+      <div class="titulo-texto">
+        <h1>Bem vindo ao NeuroWallet</h1>
+        <p class="subtitulo">Segurança da sua conta</p>
+      </div>
+      <img src="./images/Logo.png" alt="logo NeuroWallet" />
     </div>
-        
-        
+
+    <div class="titulo-especifico">
+      <label>Etapa 1 de 3 • Confirmação</label>
+      <h1>Verifique seu Email</h1>
+      <p class="subtitulo">
+        enviamos um codigo de 6 dígitos para seu email: <span>exemplo@gmail.com</span>
+      </p>
+    </div>
+
+    <form class="form" (submit)="$event.preventDefault(); verificar()">
+      <div class="verification-container">
+        <label>Código de verificação</label>
+
+        <app-codigo-verificacao (alterado)="codigo.set($event)" />
+
+        @if (erro()) {
+          <p class="erro" role="alert">{{ erro() }}</p>
+        }
+
+        @if (segundos() > 0) {
+          <small>Não recebeu o código? Reenviar em {{ segundos() }}s</small>
+        } @else {
+          <small
+            >Não recebeu o código?
+            <button type="button" class="reenviar" (click)="reenviar()">Reenviar código</button>
+          </small>
+        }
+      </div>
+
+      <div class="button-login">
+        <button type="submit" [disabled]="codigo().length < 6 || enviando()">
+          {{ enviando() ? 'Verificando...' : 'Verificar' }}
+        </button>
+        <div class="voltinha">
+          <p>O código não funcionou? Aguarde o próximo e tente de novo.</p>
+          <a routerLink="/login"> voltar</a>
+        </div>
+      </div>
+    </form>
+    <div class="protegido">
+      <p>
+        Protegido por reCAPTCHA (<a
+          href="https://policies.google.com/privacy?hl=pt&client_theme=dark"
+          target="_blank"
+          rel="noopener"
+          >Privacidade</a
+        >
+        e
+        <a
+          href="https://policies.google.com/terms?hl=pt&client_theme=dark"
+          target="_blank"
+          rel="noopener"
+          >Termos</a
+        >
+        do Google). Dados tratados conforme a LGPD, veja nossa política.
+      </p>
+    </div>
   </div>
 </main>
