@@ -1,0 +1,486 @@
+main {
+  min-height: 100dvh;
+  padding: 48px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0 url('/images/Tela-de-formas.png') center/cover no-repeat;
+  color: #27252f;
+}
+.login-card {
+  width: 100%;
+  max-width: 438px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 38px 44px 54px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+.titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.titulo-texto {
+  min-width: 0;
+}
+.titulo img {
+  width: 80px;
+  height: 100px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+h1 {
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 400;
+  font-style: italic;
+  margin: 0;
+}
+.subtitulo,
+p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #6e6878;
+}
+.subtitulo {
+  margin-top: 8px;
+}
+form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  min-width: 0;
+}
+.input {
+  min-width: 0;
+}
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+input:not([type='checkbox']) {
+  width: 100%;
+  height: 52px;
+  border: 1px solid #d9d4df;
+  border-radius: 8px;
+  background: #fcfaff;
+  padding: 14px 16px;
+  color: #343546;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+input::placeholder {
+  color: #807889;
+}
+input:focus {
+  border-color: #a3278f;
+  box-shadow: 0 0 0 2px #a3278f15;
+}
+input[aria-invalid='true'] {
+  border-color: #b3261e;
+}
+.password-field {
+  position: relative;
+}
+.password-field input {
+  padding-right: 76px;
+}
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 0;
+  height: 52px;
+  background: none;
+  border: 0;
+  color: #a3278f;
+  font-size: 13px;
+  cursor: pointer;
+}
+.opcoes {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.remember,
+.termos {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  font-size: 13px;
+  color: #6e6878;
+  font-weight: 400;
+}
+.termos {
+  align-items: flex-start;
+  line-height: 1.6;
+}
+.remember input,
+.termos input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #a3278f;
+  margin-top: 1px;
+}
+a {
+  color: #a3278f;
+  text-decoration: none;
+  font-size: 13px;
+}
+a:hover {
+  text-decoration: underline;
+}
+.primary,
+.button-login > button,
+.button-login > .butao {
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 18px;
+  background: #a3278f;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+.button-login {
+  display: grid;
+  gap: 16px;
+  text-align: center;
+}
+.button-login p {
+  font-size: 13px;
+}
+.button-criar {
+  text-align: center;
+  display: grid;
+  gap: 14px;
+}
+.button-criar p {
+  margin: 0;
+}
+.button-criar a {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #a3278f;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.erro {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #b3261e;
+  padding: 8px 0;
+}
+.notice {
+  padding: 12px;
+  background: #f6eff7;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.dica,
+small {
+  display: block;
+  font-size: 12px;
+  color: #706a7b;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+footer {
+  border-top: 1px solid #e8e3ed;
+  padding-top: 26px;
+  text-align: center;
+  display: grid;
+  gap: 14px;
+  font-size: 11px;
+  color: #706a7b;
+  line-height: 1.8;
+}
+footer p {
+  font-size: 11px;
+}
+footer a {
+  font-size: 12px;
+}
+.back-link {
+  text-align: center;
+}
+.security-card {
+  max-width: 640px;
+  padding: 36px 56px 40px;
+  gap: 28px;
+}
+.security-card .titulo {
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e8e3ed;
+}
+.security-card .titulo h1 {
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+}
+.security-card h2 {
+  font-size: 28px;
+  line-height: 1.25;
+  color: #27252f;
+  font-weight: 700;
+}
+.security-card .etapa {
+  font-size: 12px;
+  color: #a3278f;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+.security-card .description {
+  margin-top: 16px;
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 460px;
+}
+.security-card .verification-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+.security-card .verification-container label {
+  font-size: 15px;
+  margin-bottom: 0;
+}
+.security-card form {
+  gap: 48px;
+}
+.security-card .button-login {
+  max-width: 350px;
+  width: 100%;
+  margin: auto;
+}
+.security-card .button-login small {
+  font-size: 13px;
+}
+.security-card .secondary-action {
+  background: none;
+  border: 0;
+  color: #a3278f;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+.security-card footer {
+  gap: 28px;
+}
+.security-card footer p {
+  font-size: 13px;
+}
+.details {
+  display: grid;
+  gap: 26px;
+}
+.details h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.details p {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.key-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+  background: #faf6fc;
+  border: 1px solid #e9e1ef;
+  padding: 18px;
+  border-radius: 8px;
+}
+.key-text {
+  font-size: 18px;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.copy-button {
+  border: 0;
+  background: none;
+  color: #a3278f;
+  white-space: nowrap;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.key-container {
+  display: grid;
+  gap: 18px;
+}
+.recovery-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.recovery-grid code {
+  padding: 12px;
+  background: #faf6fc;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.qr-option summary {
+  font-size: 13px;
+  color: #a3278f;
+  cursor: pointer;
+}
+.qr-option img {
+  display: block;
+  width: 180px;
+  height: 180px;
+  margin: 14px auto;
+}
+.orange {
+  background: #ff542b;
+  color: #343546;
+}
+.compact-security {
+  max-width: 560px;
+  padding: 40px;
+}
+.compact-security .titulo {
+  border: 0;
+  padding: 0;
+}
+.compact-security .titulo h1 {
+  font-style: italic;
+  font-weight: 400;
+  font-size: 26px;
+}
+.compact-security .titulo img {
+  width: 64px;
+  height: 80px;
+}
+.compact-security form {
+  gap: 20px;
+}
+.compact-security .primary {
+  background: #ff542b;
+  color: #343546;
+}
+.compact-security .description {
+  font-size: 14px;
+  margin: 0;
+}
+.compact-security footer {
+  border: 0;
+  padding: 0;
+  text-align: left;
+  gap: 22px;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #df9bd2;
+  outline-offset: 3px;
+}
+@media (min-width: 1800px) {
+  .login-card {
+    max-width: 560px;
+    padding: 44px 56px 60px;
+  }
+  .security-card {
+    max-width: 800px;
+    padding: 48px 60px;
+  }
+  .compact-security {
+    max-width: 680px;
+  }
+  .titulo img {
+    width: 100px;
+    height: 120px;
+  }
+}
+@media (max-width: 600px) {
+  main {
+    padding: 24px 14px;
+    background-attachment: fixed;
+  }
+  .login-card,
+  .security-card,
+  .compact-security {
+    padding: 26px 22px;
+    border-radius: 18px;
+    gap: 24px;
+  }
+  .titulo {
+    gap: 14px;
+  }
+  .titulo img {
+    width: 64px;
+    height: 80px;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  .security-card h2 {
+    font-size: 24px;
+  }
+  .security-card .description {
+    font-size: 14px;
+  }
+  .security-card .titulo h1 {
+    font-size: 22px;
+  }
+  .security-card .etapa {
+    margin-bottom: 16px;
+  }
+  .security-card form {
+    gap: 28px;
+  }
+  .opcoes {
+    flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .key-box {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .recovery-grid {
+    grid-template-columns: 1fr;
+  }
+  .security-card footer p {
+    font-size: 12px;
+  }
+}
+
+.security-card {
+  --codigo-altura: 68px;
+  --codigo-gap: 12px;
+  --codigo-raio: 14px;
+  --codigo-fonte: 24px;
+}
+@media (max-width: 600px) {
+  .security-card {
+    --codigo-altura: 52px;
+    --codigo-gap: 6px;
+    --codigo-raio: 8px;
+    --codigo-fonte: 20px;
+  }
+}

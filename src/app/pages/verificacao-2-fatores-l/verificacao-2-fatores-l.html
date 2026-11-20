@@ -1,16 +1,23 @@
 <main>
-  <section class="login-card">
+  <section
+    class="login-card security-card"
+    [class.compact-security]="!configurar && !recuperacao().length"
+  >
     <div class="titulo">
-      <a routerLink="/login">← Voltar ao login</a><img src="/images/Logo.png" alt="NeuroWALLet" />
+      <div>
+        <h1>{{ configurar ? 'NeuroWALLet' : 'Confirme seu acesso' }}</h1>
+        <p class="subtitulo">
+          {{ configurar ? 'Segurança da sua conta' : 'Digite o código temporário de 2FA' }}
+        </p>
+      </div>
+      <img src="/images/Logo.png" alt="Logo NeuroWALLet" />
     </div>
     @if (recuperacao().length) {
-      <div class="auth-icon">✓</div>
       <div>
-        <p class="etapa">Proteção ativada</p>
-        <h1>Uma última coisa.</h1>
-        <p>
-          Guarde seus códigos de recuperação. Eles permitem entrar se você perder acesso ao
-          autenticador. Cada código funciona uma única vez.
+        <p class="etapa">PROTEÇÃO ATIVADA</p>
+        <h2>Guarde seus códigos de recuperação</h2>
+        <p class="description">
+          Cada código pode ser utilizado uma única vez se você perder acesso ao autenticador.
         </p>
       </div>
       <div class="recovery-grid">
@@ -18,20 +25,25 @@
           <code>{{ item }}</code>
         }
       </div>
-      <a class="secondary" routerLink="/inicio">Já guardei meus códigos. Ir para o painel →</a>
+      <a class="primary" routerLink="/inicio">Já guardei. Ir para o painel</a>
     } @else {
-      <div class="auth-icon">◇</div>
-      <div>
-        <p class="etapa">{{ configurar ? 'Configure sua proteção' : 'Só mais uma etapa' }}</p>
-        <h1>{{ configurar ? 'Confirme seu autenticador' : 'Vamos confirmar que é você' }}</h1>
-        <p>
+      @if (configurar) {
+        <div>
+          <p class="etapa">ETAPA 2 DE 2 • CONFIRMAÇÃO</p>
+          <h2>Confirme seu autenticador</h2>
+          <p class="description">
+            Abra o aplicativo autenticador e digite o código de 6 dígitos da sua conta NeuroWALLet.
+          </p>
+        </div>
+      } @else {
+        <p class="description">
           {{
             modoReserva()
-              ? 'Informe um dos códigos de recuperação que você guardou.'
-              : 'Abra seu aplicativo autenticador e digite o código de seis dígitos da sua conta.'
+              ? 'Use um dos seus códigos de recuperação.'
+              : 'Use o código do seu aplicativo autenticador.'
           }}
         </p>
-      </div>
+      }
       <form (submit)="$event.preventDefault(); verificarCodigo()">
         <div class="verification-container">
           @if (modoReserva()) {
@@ -45,45 +57,49 @@
               placeholder="Seu código de recuperação"
             />
           } @else {
-            <label>Código do autenticador</label
-            ><app-codigo-verificacao [invalido]="!!erro()" (alterado)="codigo.set($event)" /><small
-              >O código muda a cada 30 segundos. Aguarde o próximo se necessário.</small
-            >
+            @if (configurar) {
+              <label>Código de verificação</label>
+            }
+            <app-codigo-verificacao [invalido]="!!erro()" (alterado)="codigo.set($event)" />
+            @if (configurar) {
+              <small>O código é renovado a cada 30 segundos.</small>
+            }
           }
           @if (erro()) {
             <p class="erro" role="alert">{{ erro() }}</p>
           }
         </div>
-        <button
-          type="submit"
-          [disabled]="
-            enviando() ||
-            expirada() ||
-            (modoReserva() ? !codigoReserva().trim() : codigo().length !== 6)
-          "
-        >
-          {{
-            enviando()
-              ? 'Verificando…'
-              : configurar
-                ? 'Ativar proteção e continuar'
-                : 'Acessar meu painel'
-          }}
-          →
-        </button>
+        <div class="button-login">
+          <button
+            type="submit"
+            [disabled]="
+              enviando() ||
+              expirada() ||
+              (modoReserva() ? !codigoReserva().trim() : codigo().length !== 6)
+            "
+          >
+            {{ enviando() ? 'Verificando…' : configurar ? 'Verificar e ativar 2FA' : 'Confirmar' }}
+          </button>
+          @if (configurar) {
+            <small>O 2FA será ativado após a confirmação do código.</small>
+          }
+        </div>
       </form>
-      @if (!configurar) {
-        <button class="toggle" type="button" (click)="alternar()" [disabled]="enviando()">
-          {{
-            modoReserva()
-              ? 'Usar aplicativo autenticador'
-              : 'Não tenho acesso ao aplicativo. Usar código de recuperação'
-          }}
-        </button>
-      }
       <footer>
-        Se a verificação expirou, <a routerLink="/login">entre novamente</a>.
-        <a routerLink="/politica-de-privacidade">Sua privacidade</a>
+        @if (configurar) {
+          <p>O código não funcionou? Aguarde o próximo e tente de novo.</p>
+        }
+        <a routerLink="/login">Voltar</a>
+        @if (!configurar) {
+          <button
+            class="secondary-action"
+            type="button"
+            (click)="alternar()"
+            [disabled]="enviando()"
+          >
+            {{ modoReserva() ? 'Usar aplicativo autenticador' : 'Usar código de recuperação' }}
+          </button>
+        }
       </footer>
     }
   </section>

@@ -17,6 +17,7 @@ export class Login {
 
   protected readonly cadastroRecebido =
     inject(ActivatedRoute).snapshot.queryParamMap.get('cadastro') === 'recebido';
+  protected readonly mostrarSenha = signal(false);
   protected readonly enviando = signal(false);
   protected readonly erro = signal<string | null>(null);
 
@@ -26,6 +27,12 @@ export class Login {
     lembrar: [false],
   });
 
+  constructor() {
+    if (typeof localStorage !== 'undefined') {
+      const email = localStorage.getItem('nw-email');
+      if (email) this.form.patchValue({ email, lembrar: true });
+    }
+  }
   protected campoInvalido(nome: 'email' | 'senha'): boolean {
     const campo = this.form.controls[nome];
     return campo.invalid && (campo.touched || campo.dirty);
@@ -38,6 +45,11 @@ export class Login {
     }
     if (this.enviando()) return;
 
+    if (typeof localStorage !== 'undefined') {
+      const dados = this.form.getRawValue();
+      if (dados.lembrar) localStorage.setItem('nw-email', dados.email);
+      else localStorage.removeItem('nw-email');
+    }
     this.enviando.set(true);
     this.erro.set(null);
 

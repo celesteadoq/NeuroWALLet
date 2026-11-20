@@ -33,6 +33,8 @@ export class Cadastro {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
+  protected readonly mostrarSenha = signal(false);
+  protected readonly mostrarConfirmacao = signal(false);
   protected readonly enviando = signal(false);
   protected readonly erro = signal<string | null>(null);
 

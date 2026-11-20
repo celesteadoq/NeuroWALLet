@@ -1,1 +1,24 @@
-@import '../auth-base.css';
+@import '../auth-figma.css';
+main {
+  background-image: url('/images/Tela-De-Cadastro.png');
+}
+
+.login-card {
+  padding: 28px 44px;
+  gap: 20px;
+}
+form {
+  gap: 16px;
+}
+footer {
+  padding-top: 16px;
+  gap: 0;
+}
+footer p {
+  font-size: 10px;
+}
+@media (max-width: 600px) {
+  .login-card {
+    padding: 26px 22px;
+  }
+}

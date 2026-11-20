@@ -1,1 +1,9 @@
-@import '../auth-base.css';
+@import '../auth-figma.css';
+
+@media (min-width: 1024px) {
+  .login-card {
+    position: relative;
+    left: 33px;
+    top: 20px;
+  }
+}
