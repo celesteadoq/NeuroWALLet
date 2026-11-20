@@ -1,95 +1,17 @@
-<main> 
-    <div class="login-card">
-        
-         <div class="titulo">
-            <div class="titulo-texto">
-            <h1>Conecte sua conta bancária</h1>
-            <p class="subtitulo">Falta só este passo para você ver seus ralos invisíveis.</p>
-            </div>
-            <img src="./images/Logo.png" alt="logo NeuroWallet" />
-            </div>
-
-        <div class="confiança">
-            <div class="cards">
-                <h1>O que vamos ler</h1>
-                <p>O histórico dos últimos 90 dias de transações.</p>
-            </div>
-            <div class="cards">
-                <h1>Só leitura</h1>
-                <p>Não fazemos pagamentos, transferências nem bloqueamos cartões.</p>
-            </div>
-            <div class="cards">
-                <h1>Seus dados são seus</h1>
-                <p>Seus dados são privados. Não vendemos nem compartilhamos suas informações.</p>
-            </div>
-
-        </div>
-        
-        <form class="form" [formGroup]="form" (ngSubmit)="continuar()" novalidate>
-
-        <div class="instituicao">
-            <label for="banco">Instituição financeira</label>
-
-            <div class="select-container">
-
-            <select id="banco" formControlName="instituicao" [attr.aria-invalid]="instituicaoInvalida()">
-                <option value="" disabled>
-                Selecione sua instituição
-                </option>
-
-                <option value="nubank">Nubank</option>
-                <option value="itau">Itaú</option>
-                <option value="bradesco">Bradesco</option>
-                <option value="santander">Santander</option>
-                <option value="banco-do-brasil">Banco do Brasil</option>
-                <option value="caixa">Caixa Econômica Federal</option>
-            </select>
-
-            <span class="seta" aria-hidden="true">⌄</span>
-            </div>
-
-            @if (instituicaoInvalida()) {
-                <p class="erro" role="alert">Selecione sua instituição.</p>
-            }
-
-            <p class="descricao-instituicao">
-            Você será direcionado ao ambiente seguro do Open Finance
-            para autorizar o acesso aos seus dados.
-            </p>
-        </div>
-
-        @if (erro()) {
-            <p class="erro" role="alert">{{ erro() }}</p>
-        }
-
-        <div class="button-login">
-            <button type="submit" [disabled]="enviando()">
-            {{ enviando() ? 'Conectando...' : 'Conectar conta' }}
-            </button>
-
-            <a routerLink="/login">voltar</a>
-        </div>
-
-    </form>
-
-
-
-     <footer class="login-footer">
-
-      <p>
-        Protegido por reCAPTCHA
-        <a href="https://policies.google.com/privacy?hl=pt&client_theme=dark" target="_blank" rel="noopener">Privacidade</a> e
-        <a href="https://policies.google.com/terms?hl=pt&client_theme=dark" target="_blank" rel="noopener">Termos do Google</a>.
-      </p>
-
-      <p>
-        Dados tratados conforme a LGPD, veja nossa política.
-      </p>
-
-      <div class="footer-links">
-        <a routerLink="/politica-de-privacidade">Política de Privacidade</a>
-        <a routerLink="/termos-de-uso">Termos de Uso</a>
-      </div>
-    </footer>
-  </div>
+<main>
+  <section class="login-card">
+    <h1>Conecte sua conta bancária</h1>
+    <p>
+      Escolha sua instituição no ambiente seguro da Pluggy e autorize a leitura do seu histórico.
+      Não fazemos pagamentos ou transferências.
+    </p>
+    @if (erro()) {
+      <p role="alert">{{ erro() }}</p>
+    }
+    <div class="button-login">
+      <button (click)="continuar()" [disabled]="enviando()">
+        {{ enviando() ? 'Abrindo conexão...' : 'Conectar conta' }}</button
+      ><a routerLink="/inicio">Voltar ao início</a>
+    </div>
+  </section>
 </main>

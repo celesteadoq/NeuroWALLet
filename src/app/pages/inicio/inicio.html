@@ -1,16 +1,84 @@
 <main>
-  <section class="login-card" aria-labelledby="titulo-pagina">
-    <div class="titulo">
-      <div class="titulo-texto">
-        <p class="etapa">NeuroWALLet</p>
-        <h1 id="titulo-pagina">Início</h1>
-        <p class="subtitulo">Seu painel ainda está em construção.</p>
-      </div>
-      <img class="logo" src="images/Logo.png" alt="Logo NeuroWallet" />
-    </div>
-
-    <div class="button-login">
-      <button type="button" class="botao" (click)="sair()">Sair</button>
-    </div>
+  <section class="login-card">
+    <h1>NeuroWALLet</h1>
+    <p>Seu resumo financeiro</p>
+    <nav>
+      <a routerLink="/banco">Conectar banco</a> <button (click)="carregar()">Atualizar</button>
+      <button (click)="sair()">Sair</button>
+    </nav>
+    @if (aviso()) {
+      <p role="status">{{ aviso() }}</p>
+    }
+    <h2>Contas bancárias</h2>
+    @for (conta of contas(); track conta.id) {
+      <p>
+        {{ conta.instituicao }} <button (click)="sincronizar(conta.id)">Importar transações</button>
+      </p>
+    } @empty {
+      <p>Nenhuma conta vinculada.</p>
+    }
+    @for (s of secoes; track s.rota) {
+      <section>
+        <h2>{{ s.titulo }}</h2>
+        @if (erros()[s.rota]) {
+          <p role="alert">{{ erros()[s.rota] }}</p>
+        } @else if (dados()[s.rota] === undefined) {
+          <p>Carregando...</p>
+        } @else {
+          @switch (s.rota) {
+            @case ('/painel/ralos') {
+              @for (loja of dados()[s.rota].resultados; track loja.estabelecimentoId) {
+                <p>
+                  {{ loja.nome }} · {{ loja.compras }} compras ·
+                  {{ loja.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'en-US' }}
+                </p>
+              } @empty {
+                <p>Nenhum gasto analisado neste mês.</p>
+              }
+            }
+            @case ('/alertas') {
+              @for (alerta of dados()[s.rota]; track alerta.id) {
+                <article>
+                  <p>{{ alerta.mensagem }}</p>
+                  <p>
+                    Projeção: {{ alerta.projecao | currency: 'BRL' }} ·
+                    {{ alerta.criadoEm | date: 'dd/MM/yyyy' }}
+                  </p>
+                </article>
+              } @empty {
+                <p>Nenhum alerta.</p>
+              }
+            }
+            @case ('/faturas/projecao') {
+              @for (mes of dados()[s.rota]; track mes.mesReferencia) {
+                <p>{{ mes.mesReferencia }} · {{ mes.valorProjetado | currency: 'BRL' }}</p>
+              } @empty {
+                <p>Nenhuma parcela projetada.</p>
+              }
+            }
+            @case ('/gamificacao/selos') {
+              @for (selo of dados()[s.rota]; track selo.nome) {
+                <p>
+                  {{ selo.nome }} · {{ selo.criterioDias }} dias ·
+                  {{ selo.concedidoEm | date: 'dd/MM/yyyy' }}
+                </p>
+              } @empty {
+                <p>Você ainda não conquistou selos.</p>
+              }
+            }
+            @case ('/relatorios') {
+              @for (relatorio of dados()[s.rota]; track relatorio.mes) {
+                <article>
+                  <h3>{{ relatorio.mes }}</h3>
+                  <p>{{ relatorio.texto }}</p>
+                </article>
+              } @empty {
+                <p>Nenhum relatório disponível.</p>
+              }
+            }
+          }
+        }
+      </section>
+    }
   </section>
 </main>
