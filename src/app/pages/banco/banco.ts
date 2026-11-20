@@ -9,6 +9,7 @@ declare global {
   interface Window {
     PluggyConnect: new (options: {
       connectToken: string;
+      includeSandbox: boolean;
       onSuccess: () => void;
       onError: () => void;
       onClose: () => void;
@@ -60,6 +61,7 @@ export class Banco {
           await carregar();
           new window.PluggyConnect({
             connectToken: r.accessToken,
+            includeSandbox: ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname),
             onSuccess: () => {
               void this.router.navigateByUrl('/banco/retorno');
             },
