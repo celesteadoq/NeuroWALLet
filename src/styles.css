@@ -9,6 +9,7 @@
   --roxo-light: #E39AD6;
   --intermediario: #2A2B3A;
   --cinza-escuro-forte: #1E1F2B;
+  --erro: #b3261e;
 }
 
 * {
@@ -18,3 +19,21 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: 'Inter', system-ui, sans-serif; color: var(--cinza-escuro); }
+
+/* Estilos de formulário compartilhados pelas telas */
+.erro {
+  margin: 0;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  color: var(--erro);
+}
+
+input[aria-invalid='true'],
+select[aria-invalid='true'] {
+  border-color: var(--erro);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

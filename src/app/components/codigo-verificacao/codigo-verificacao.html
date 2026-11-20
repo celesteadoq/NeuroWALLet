@@ -1,0 +1,15 @@
+<div class="code-inputs" role="group" aria-label="Código de verificação">
+  @for (i of posicoes(); track i) {
+    <input
+      #campo
+      type="text"
+      inputmode="numeric"
+      [class.invalido]="invalido()"
+      [attr.autocomplete]="i === 0 ? 'one-time-code' : 'off'"
+      [attr.aria-label]="'Dígito ' + (i + 1)"
+      (input)="aoDigitar(i, $event)"
+      (keydown)="aoPressionar(i, $event)"
+      (paste)="aoColar($event)"
+    />
+  }
+</div>

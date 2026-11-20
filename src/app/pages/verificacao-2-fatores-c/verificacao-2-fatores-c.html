@@ -16,32 +16,32 @@
                    <span>exemplo@gmail.com</span></p>
             </div>
 
-            <form class="form" [formGroup]="form" (ngSubmit)="verificarCodigo()">
+            <form class="form" (submit)="$event.preventDefault(); verificar()">
 
                 <div class="verification-container">
 
                     <label>Código de verificação</label>
 
-                    <div class="code-inputs">
-                    <input type="text" maxlength="1" autofocus formControlName="digito1">
-                    <input type="text" maxlength="1" formControlName="digito2">
-                    <input type="text" maxlength="1" formControlName="digito3">
-                    <input type="text" maxlength="1" formControlName="digito4">
-                    <input type="text" maxlength="1" formControlName="digito5">
-                    <input type="text" maxlength="1" formControlName="digito6">
-                    </div>
+                    <app-codigo-verificacao (alterado)="codigo.set($event)" />
 
-                    <small>Não recebeu o codigo</small>
-                    <small>
-                    <span>Código (disponível em 30 segundos)</span>
-                    </small>
+                    @if (erro()) {
+                        <p class="erro" role="alert">{{ erro() }}</p>
+                    }
+
+                    @if (segundos() > 0) {
+                        <small>Não recebeu o código? Reenviar em {{ segundos() }}s</small>
+                    } @else {
+                        <small>Não recebeu o código?
+                            <button type="button" class="reenviar" (click)="reenviar()">Reenviar código</button>
+                        </small>
+                    }
 
                 </div>
 
                 <div class="button-login">
-                    <a routerLink="/verificacao-2-fatores-c2" class="butao" type="submit">
-                    Verificar
-                    </a>
+                    <button type="submit" [disabled]="codigo().length < 6 || enviando()">
+                    {{ enviando() ? 'Verificando...' : 'Verificar' }}
+                    </button>
                     <div class="voltinha">
                         <p>O código não funcionou? Aguarde o próximo e tente de novo.</p>
                         <a routerLink="/login"> voltar</a>
@@ -50,12 +50,11 @@
 
             </form>
     <div class="protegido">
-        <p>Protegido por reCAPTCHA (<a href="https://policies.google.com/privacy?hl=pt&client_theme=dark">Privacidade</a> e 
-            <a href="https://policies.google.com/terms?hl=pt&client_theme=dark">Termos</a> do Google). Dados tratados conforme a LGPD, veja nossa política.</p>
+        <p>Protegido por reCAPTCHA (<a href="https://policies.google.com/privacy?hl=pt&client_theme=dark" target="_blank" rel="noopener">Privacidade</a> e 
+            <a href="https://policies.google.com/terms?hl=pt&client_theme=dark" target="_blank" rel="noopener">Termos</a> do Google). Dados tratados conforme a LGPD, veja nossa política.</p>
 
     </div>
         
         
   </div>
 </main>
-

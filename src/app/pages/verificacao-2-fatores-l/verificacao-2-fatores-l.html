@@ -10,34 +10,31 @@
             </div>
 
             <div class="titulo-especifico">
-                <label>Etapa 1 de 1  •  Confirmação</label>
+                <label>Etapa 3 de 3  •  Confirmação</label>
                 <h1>Confirme seu autenticador</h1>
-                <p class="subtitulo">Abra o aplicativo autenticador e digite o código <br>
+                <p class="subtitulo">Abra o aplicativo autenticador e digite o código
                     de 6 dígitos da sua conta NeuroWALLet.</p>
             </div>
 
- <form class="form" [formGroup]="form" (ngSubmit)="verificarCodigo()">
+ <form class="form" (submit)="$event.preventDefault(); verificarCodigo()">
 
       <div class="verification-container">
 
         <label>Código de verificação</label>
 
-        <div class="code-inputs">
-          <input type="text" maxlength="1" autofocus formControlName="digito1" inputmode="numeric">
-          <input type="text" maxlength="1" formControlName="digito2" inputmode="numeric">
-          <input type="text" maxlength="1" formControlName="digito3" inputmode="numeric">
-          <input type="text" maxlength="1" formControlName="digito4" inputmode="numeric">
-          <input type="text" maxlength="1" formControlName="digito5" inputmode="numeric">
-          <input type="text" maxlength="1" formControlName="digito6" inputmode="numeric">
-        </div>
+        <app-codigo-verificacao (alterado)="codigo.set($event)" />
+
+        @if (erro()) {
+          <p class="erro" role="alert">{{ erro() }}</p>
+        }
 
         <small>O código é renovado a cada 30 segundos.</small>
 
       </div>
 
       <div class="button-login">
-        <button type="submit">
-          Verificar e ativar 2FA
+        <button type="submit" [disabled]="codigo().length < 6 || enviando()">
+          {{ enviando() ? 'Verificando...' : 'Verificar e ativar 2FA' }}
         </button>
 
         <p>O 2FA será ativado após a confirmação do código.</p>

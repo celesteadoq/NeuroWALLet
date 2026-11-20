@@ -97,36 +97,11 @@ input{
     color: var(--cinza-escuro-forte);
 }
 
-.code-inputs {
-    display: flex;
-    width: 100%;
-    gap: 5px;
-}
 
-.code-inputs input {
-    flex: 1;
-    min-width: 0;
-    height: 50px;
-    margin: 0;
-    padding: 0;
 
-    border: 1px solid var(--roxo);
-    border-radius: 8px;
 
-    text-align: center;
-    font-size: 18px;
-    background-color: var(--branco);
-    color: var(--cinza-escuro-forte);
 
-    outline: none;
-    transition: 0.2s;
-}
 
-/* Quando o input estiver selecionado */
-.code-inputs input:focus {
-    border: 1px solid #e66ac2;
-    box-shadow: 0 0 4px rgba(230, 106, 194, 0.2);
-}
 
 .verification-container small {
     font-size: 0.675rem  ;

@@ -15,7 +15,7 @@ export class BancoRetorno {
   private readonly bancoService = inject(BancoService);
   private readonly destroyRef = inject(DestroyRef);
 
-  // Provisório: depois virá do back-end ou da query string
+  // Provisório: depois virá do back-end
   protected readonly nomeBanco = 'Banco Exemplo';
 
   constructor() {
@@ -28,7 +28,7 @@ export class BancoRetorno {
     const parametros = this.rota.snapshot.queryParamMap;
 
     this.bancoService
-      .concluirConexao(parametros)
+      .concluirConexao(parametros.get('code'), parametros.get('state'))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         // replaceUrl: o código do banco só vale uma vez; o botão "voltar" não pode reutilizá-lo

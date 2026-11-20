@@ -11,7 +11,7 @@
 
             <div class="titulo-especifico">
                 <label>Etapa 2 de 3  •  Configuração</label>
-                <h1>Verifique seu Email</h1>
+                <h1>Ative a autenticação em 2 etapas</h1>
                 <p class="subtitulo">Adicione uma camada extra de proteção à sua conta
                     com um aplicativo autenticador.</p>
             </div>
@@ -31,13 +31,26 @@
         <div class="key-container">
             <div class="key-box">
                 <span class="key-text" id="key">
-                    JBSW Y3DP EHPK 3PXP
+                    @if (chave()) {
+                        {{ chaveFormatada() }}
+                    } @else if (!erro()) {
+                        Gerando chave...
+                    }
                 </span>
 
-                <button class="copy-button" (click)="copiarChave()">
+                <button class="copy-button" type="button" (click)="copiarChave()" [disabled]="!chave()">
                     {{ copiado() ? 'Copiado!' : 'Copiar chave' }}
                 </button>
             </div>
+
+            @if (erro()) {
+                <p class="erro" role="alert">
+                    {{ erro() }}
+                    @if (!chave()) {
+                        <button type="button" class="reenviar" (click)="carregarChave()">Tentar de novo</button>
+                    }
+                </p>
+            }
 
             <p class="security-text">
                 Guarde esta chave em um local seguro. Não compartilhe.
@@ -55,12 +68,11 @@
         </div>
 
     <div class="protegido">
-        <p>Protegido por reCAPTCHA (<a href="https://policies.google.com/privacy?hl=pt&client_theme=dark">Privacidade</a> e 
-            <a href="https://policies.google.com/terms?hl=pt&client_theme=dark">Termos</a> do Google). Dados tratados conforme a LGPD, veja nossa política.</p>
+        <p>Protegido por reCAPTCHA (<a href="https://policies.google.com/privacy?hl=pt&client_theme=dark" target="_blank" rel="noopener">Privacidade</a> e 
+            <a href="https://policies.google.com/terms?hl=pt&client_theme=dark" target="_blank" rel="noopener">Termos</a> do Google). Dados tratados conforme a LGPD, veja nossa política.</p>
 
     </div>
         
         
   </div>
 </main>
-

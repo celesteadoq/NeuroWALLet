@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.code-inputs {
+  display: flex;
+  width: 100%;
+  gap: 5px;
+}
+
+.code-inputs input {
+  flex: 1;
+  min-width: 0;
+  height: 50px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--roxo);
+  border-radius: 8px;
+  text-align: center;
+  font: inherit;
+  font-size: 18px;
+  background-color: var(--branco);
+  color: var(--cinza-escuro-forte);
+  transition: 0.2s;
+}
+
+.code-inputs input:focus-visible {
+  outline: 3px solid var(--roxo-light);
+  outline-offset: 1px;
+}
+
+.code-inputs input.invalido {
+  border-color: var(--erro);
+}

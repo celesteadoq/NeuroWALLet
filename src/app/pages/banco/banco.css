@@ -223,3 +223,10 @@ footer a {
     color: var(--laranja-principal);
     text-decoration: none;
 }
+
+/* o <form> assume o espaçamento que antes era do .login-card */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

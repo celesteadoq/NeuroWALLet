@@ -25,14 +25,14 @@
 
         </div>
         
-        <form [formGroup]="form" (ngSubmit)="continuar()">
+        <form class="form" [formGroup]="form" (ngSubmit)="continuar()" novalidate>
 
         <div class="instituicao">
             <label for="banco">Instituição financeira</label>
 
             <div class="select-container">
 
-            <select id="banco" formControlName="instituicao">
+            <select id="banco" formControlName="instituicao" [attr.aria-invalid]="instituicaoInvalida()">
                 <option value="" disabled>
                 Selecione sua instituição
                 </option>
@@ -45,8 +45,12 @@
                 <option value="caixa">Caixa Econômica Federal</option>
             </select>
 
-            <span class="seta">⌄</span>
+            <span class="seta" aria-hidden="true">⌄</span>
             </div>
+
+            @if (instituicaoInvalida()) {
+                <p class="erro" role="alert">Selecione sua instituição.</p>
+            }
 
             <p class="descricao-instituicao">
             Você será direcionado ao ambiente seguro do Open Finance
@@ -54,12 +58,16 @@
             </p>
         </div>
 
+        @if (erro()) {
+            <p class="erro" role="alert">{{ erro() }}</p>
+        }
+
         <div class="button-login">
-            <button type="submit">
-            conectar contar
+            <button type="submit" [disabled]="enviando()">
+            {{ enviando() ? 'Conectando...' : 'Conectar conta' }}
             </button>
 
-            <a href="/login">voltar</a>
+            <a routerLink="/login">voltar</a>
         </div>
 
     </form>
@@ -70,8 +78,8 @@
 
       <p>
         Protegido por reCAPTCHA
-        <a href="https://policies.google.com/privacy?hl=pt&client_theme=dark">Privacidade</a> e
-        <a href="https://policies.google.com/terms?hl=pt&client_theme=dark">Termos do Google</a>.
+        <a href="https://policies.google.com/privacy?hl=pt&client_theme=dark" target="_blank" rel="noopener">Privacidade</a> e
+        <a href="https://policies.google.com/terms?hl=pt&client_theme=dark" target="_blank" rel="noopener">Termos do Google</a>.
       </p>
 
       <p>
@@ -79,8 +87,8 @@
       </p>
 
       <div class="footer-links">
-        <a href="#">Política de Privacidade</a>
-        <a href="#">Termos de Uso</a>
+        <a routerLink="/politica-de-privacidade">Política de Privacidade</a>
+        <a routerLink="/termos-de-uso">Termos de Uso</a>
       </div>
     </footer>
   </div>

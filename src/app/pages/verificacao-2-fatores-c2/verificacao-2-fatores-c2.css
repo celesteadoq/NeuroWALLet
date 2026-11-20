@@ -223,3 +223,14 @@ footer a {
     color: var(--laranja-principal);
     text-decoration: none;
 }
+/* botão com aparência de link ("Reenviar código", "Tentar de novo") */
+.reenviar {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--roxo);
+  text-decoration: underline;
+  cursor: pointer;
+}

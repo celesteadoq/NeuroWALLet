@@ -1,4 +1,7 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { Verificacao2FatoresL } from './verificacao-2-fatores-l';
 
 describe('Verificacao2FatoresL', () => {
@@ -8,6 +11,7 @@ describe('Verificacao2FatoresL', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Verificacao2FatoresL],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Verificacao2FatoresL);
