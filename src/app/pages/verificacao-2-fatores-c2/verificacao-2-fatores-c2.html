@@ -34,8 +34,8 @@
                     JBSW Y3DP EHPK 3PXP
                 </span>
 
-                <button class="copy-button" onclick="copyKey()">
-                    Copiar chave
+                <button class="copy-button" (click)="copiarChave()">
+                    {{ copiado() ? 'Copiado!' : 'Copiar chave' }}
                 </button>
             </div>
 
@@ -46,13 +46,11 @@
 
            
         <div class="button-login">
-            <a href="/verificacao-2-fatores-l">
-            <button type="submit">
+            <a class="butao" routerLink="/verificacao-2-fatores-l">
             Continuar
-            </button>
             </a>
             <div class="voltinha">
-                <a href="/login"> cancelar</a>
+                <a routerLink="/login"> cancelar</a>
             </div>
         </div>
 

@@ -25,41 +25,45 @@
 
         </div>
         
+        <form [formGroup]="form" (ngSubmit)="continuar()">
+
         <div class="instituicao">
             <label for="banco">Instituição financeira</label>
 
             <div class="select-container">
 
+            <select id="banco" formControlName="instituicao">
+                <option value="" disabled>
+                Selecione sua instituição
+                </option>
 
-                <select id="banco" name="banco" required>
-                    <option value="" disabled selected>
-                        Selecione sua instituição
-                    </option>
+                <option value="nubank">Nubank</option>
+                <option value="itau">Itaú</option>
+                <option value="bradesco">Bradesco</option>
+                <option value="santander">Santander</option>
+                <option value="banco-do-brasil">Banco do Brasil</option>
+                <option value="caixa">Caixa Econômica Federal</option>
+            </select>
 
-                    <option value="nubank">Nubank</option>
-                    <option value="itau">Itaú</option>
-                    <option value="bradesco">Bradesco</option>
-                    <option value="santander">Santander</option>
-                    <option value="banco-do-brasil">Banco do Brasil</option>
-                    <option value="caixa">Caixa Econômica Federal</option>
-                </select>
-
-                <span class="seta">⌄</span>
+            <span class="seta">⌄</span>
             </div>
 
             <p class="descricao-instituicao">
-                Você será direcionado ao ambiente seguro do Open Finance
-                para autorizar o acesso aos seus dados.
+            Você será direcionado ao ambiente seguro do Open Finance
+            para autorizar o acesso aos seus dados.
             </p>
         </div>
-
 
         <div class="button-login">
             <button type="submit">
             conectar contar
             </button>
+
             <a href="/login">voltar</a>
         </div>
+
+    </form>
+
 
 
      <footer class="login-footer">

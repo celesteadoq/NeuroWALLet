@@ -16,37 +16,39 @@
                     de 6 dígitos da sua conta NeuroWALLet.</p>
             </div>
 
-        <form class="form">
+ <form class="form" [formGroup]="form" (ngSubmit)="verificarCodigo()">
 
-        <div class="verification-container">
+      <div class="verification-container">
 
-            <label>Código de verificação</label>
+        <label>Código de verificação</label>
 
-            <div class="code-inputs">
-                <input type="text" maxlength="1" autofocus>
-                <input type="text" maxlength="1">
-                <input type="text" maxlength="1">
-                <input type="text" maxlength="1">
-                <input type="text" maxlength="1">
-                <input type="text" maxlength="1">
-            </div>
-
-            <small>O código é renovado a cada 30 segundos.</small>
-
+        <div class="code-inputs">
+          <input type="text" maxlength="1" autofocus formControlName="digito1" inputmode="numeric">
+          <input type="text" maxlength="1" formControlName="digito2" inputmode="numeric">
+          <input type="text" maxlength="1" formControlName="digito3" inputmode="numeric">
+          <input type="text" maxlength="1" formControlName="digito4" inputmode="numeric">
+          <input type="text" maxlength="1" formControlName="digito5" inputmode="numeric">
+          <input type="text" maxlength="1" formControlName="digito6" inputmode="numeric">
         </div>
-           
-        <div class="button-login">
-            <button type="submit">
-            Verificar e ativar 2FA
-            </button>
-            <p>O 2FA será ativado após a confirmação do código.</p>
-        </div>
+
+        <small>O código é renovado a cada 30 segundos.</small>
+
+      </div>
+
+      <div class="button-login">
+        <button type="submit">
+          Verificar e ativar 2FA
+        </button>
+
+        <p>O 2FA será ativado após a confirmação do código.</p>
+      </div>
 
     </form>
+
     
     <div class="voltinha">
         <p>O código não funcionou? Aguarde o próximo e tente de novo.</p>
-        <a href="/login"> voltar</a>
+        <a routerLink="/login"> voltar</a>
     </div>
         
         
