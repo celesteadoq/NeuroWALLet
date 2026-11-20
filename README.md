@@ -15,7 +15,7 @@ O proxy.conf.json encaminha /api/** para http://localhost:8080. O backend deve u
 
 - Cadastro com consentimento LGPD, seguido de login (o cadastro retorna uma resposta genérica).
 - Login com token temporário, configuração do autenticador por QR/chave, confirmação TOTP e códigos de recuperação.
-- Sessão Bearer JWT em sessionStorage da aba, renovação coordenada do refresh token e logout.
+- Sessão Bearer JWT: sessionStorage sem a opção Manter conectado; localStorage com a opção marcada. O token temporário de 2FA permanece apenas na aba. Renovação de acesso e logout com limpeza dos tokens dos dois armazenamentos.
 - Recuperação de senha por e-mail; o link chega ao Mailpit local em http://localhost:8025. O front recebe /redefinir-senha#token=... e remove o token da URL após a leitura.
 - Conexão via Pluggy Connect com token emitido pela API. Credenciais Pluggy e webhook HTTPS ficam no backend. A seleção da instituição acontece no widget. A tela aguarda o webhook e permite consultar novamente.
 - Lista de contas, importação manual, resumo mensal, alertas, projeção de faturas, selos e relatórios com dados reais ou estado vazio.
@@ -31,6 +31,6 @@ O build gera dist/neuro-wallet. As páginas são renderizadas no cliente para ma
 
 O proxy do ng serve é usado apenas durante desenvolvimento. Se hospedar somente os arquivos estáticos, configure o servidor de hospedagem para encaminhar /api/** ao backend e retornar index.html para as rotas do Angular.
 
-O painel possui navegação por contas, gastos, alertas, faturas, conquistas e relatórios. Termos de uso e política de privacidade possuem páginas próprias com texto de exemplo para revisão da equipe; responsável pelos dados, canal de contato e retenção ainda devem ser definidos antes da disponibilização pública.
+O painel segue a identidade visual do Figma, com navegação superior e menu compacto no celular. Inclui resumo, faturas, alertas, conquistas, contas, criação/edição/exclusão de gatilhos e lista branca, sumários e exportação de relatórios em CSV/PDF. As informações que a API não fornece não são simuladas. As animações respeitam a preferência de movimento reduzido. Termos de uso e política de privacidade possuem páginas próprias com texto de exemplo para revisão da equipe; responsável pelos dados, canal de contato e retenção ainda devem ser definidos antes da disponibilização pública.
 
 A autenticação permite nova tentativa após erro, informa limites de requisições e possui tempo limite de rede. Os testes cobrem código incorreto, excesso de tentativas, sessão expirada e prevenção de envios duplicados.

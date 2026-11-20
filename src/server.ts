@@ -14,7 +14,7 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 const apiOrigin = new URL(process.env['API_TARGET'] || 'http://127.0.0.1:8080');
-app.use('/api', (req, res) => {
+app.use(['/api', '/actuator'], (req, res) => {
   const target = new URL(req.originalUrl, apiOrigin);
   const upstream = (target.protocol === 'https:' ? httpsRequest : httpRequest)(
     target,

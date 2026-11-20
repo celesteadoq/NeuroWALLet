@@ -7,7 +7,7 @@ import { SessaoService } from '../../services/sessao.service';
 type Tokens = { accessToken: string; refreshToken: string };
 const renovacoes = new WeakMap<SessaoService, Observable<Tokens>>();
 export const apiInterceptor: HttpInterceptorFn = (req, next) => {
-  if (!req.url.startsWith(API.baseUrl + '/')) return next(req);
+  if (!req.url.startsWith(API.baseUrl + '/') && !req.url.startsWith('/actuator/')) return next(req);
   const sessao = inject(SessaoService),
     http = inject(HttpClient),
     router = inject(Router);

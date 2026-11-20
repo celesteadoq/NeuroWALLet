@@ -1,267 +1,598 @@
 <div class="app-shell">
-  <aside class="sidebar">
-    <a class="brand" routerLink="/inicio"
-      ><img src="/images/Logo.png" alt="" />NeuroWALLet<span>FINANÇAS COM CONSCIÊNCIA</span></a
+  <header class="topbar">
+    <a routerLink="/inicio" class="brand" (click)="navegar('inicio')"
+      ><img src="/images/Logo.png" alt="" />NeuroWALLet</a
     >
-    <p class="nav-label">SEU ESPAÇO</p>
-    <button
-      class="mobile-menu"
-      (click)="menuAberto.set(!menuAberto())"
-      [attr.aria-expanded]="menuAberto()"
-      aria-controls="menu-principal"
-    >
-      {{ menuAberto() ? 'Fechar ✕' : 'Menu ☰' }}
-    </button>
-    <nav id="menu-principal" [class.open]="menuAberto()" aria-label="Menu principal">
+    <div class="header-actions">
+      @if (!admin()) {
+        <button (click)="sincronizar()" [disabled]="ocupado()">
+          ↻ <span>{{ ocupado() ? 'Processando…' : 'Sincronizar' }}</span>
+        </button>
+      }
+      <button (click)="sair()">↪ Sair</button
+      ><button
+        class="menu-toggle"
+        (click)="menuAberto.set(!menuAberto())"
+        [attr.aria-expanded]="menuAberto()"
+        aria-controls="navigation"
+      >
+        {{ menuAberto() ? 'Fechar ✕' : 'Menu ☰' }}
+      </button>
+    </div>
+  </header>
+  @if (!admin()) {
+    <nav id="navigation" class="navigation" [class.open]="menuAberto()" aria-label="Menu principal">
       @for (item of menu; track item.id) {
         <button
           [class.active]="aba() === item.id"
           [attr.aria-current]="aba() === item.id ? 'page' : null"
-          (click)="aba.set(item.id); menuAberto.set(false)"
+          (click)="navegar(item.id)"
         >
-          <span>{{ item.icone }}</span>{{ item.nome }}
+          {{ item.nome }}
         </button>
       }
-    </nav>
-    <div class="sidebar-bottom">
-      <div class="privacy-card">
-        <span>◇</span><strong>Você no controle</strong>
-        <p>Suas conexões são de leitura. Seu dinheiro continua com você.</p>
-        <a routerLink="/politica-de-privacidade">Saiba sobre privacidade →</a>
-      </div>
-      <button class="logout" (click)="sair()">↪ Sair da conta</button>
-    </div>
-  </aside>
-  <div class="workspace">
-    <header>
-      <span
-        >Meu espaço <span class="muted">/ {{ titulo() }}</span></span
+      <button
+        class="mobile-utility"
+        (click)="sincronizar(); menuAberto.set(false)"
+        [disabled]="ocupado()"
       >
-      <button class="header-exit secondary" (click)="sair()">Sair</button>
-      <div class="profile">
-        <span class="avatar">N</span><span>Minha conta<small>Acesso protegido por 2FA</small></span>
+        ↻ Sincronizar</button
+      ><button class="mobile-utility" (click)="sair()">↪ Sair</button>
+    </nav>
+  }
+  <main>
+    <div class="heading">
+      <div>
+        <h1>{{ titulo() }}</h1>
+        <p>
+          {{
+            aba() === 'inicio'
+              ? 'Este é o seu panorama financeiro. Cada escolha conta.'
+              : aba() === 'faturas'
+                ? 'Veja como as parcelas de hoje se distribuem nos próximos meses.'
+                : aba() === 'alertas'
+                  ? 'Identifique padrões antes que pequenas compras virem grandes gastos.'
+                  : aba() === 'conquistas'
+                    ? 'Cada escolha consciente conta. Acompanhe seu progresso.'
+                    : aba() === 'gatilhos'
+                      ? 'Transforme seus limites em alertas que fazem sentido para você.'
+                      : aba() === 'lista'
+                        ? 'Escolha quais estabelecimentos devem ficar fora da análise.'
+                        : aba() === 'sumario'
+                          ? 'Uma leitura dos seus hábitos para apoiar suas próximas decisões.'
+                          : aba() === 'exportar'
+                            ? 'Escolha o formato que funciona melhor para você.'
+                            : 'Ajuste sua experiência e acompanhe suas informações.'
+          }}
+        </p>
       </div>
-    </header>
-    <main>
-      <div class="page-heading">
-        <div>
-          <p class="eyebrow">UM PASSO DE CADA VEZ</p>
-          <h1>{{ titulo() }}</h1>
-          <p>Mais clareza sobre seus hábitos. Mais espaço para suas escolhas.</p>
-        </div>
-        <button class="secondary" (click)="carregar()">↻ Atualizar dados</button>
-      </div>
-      @if (aviso()) {
-        <p class="notice" role="status">{{ aviso() }}</p>
+      @if (aba() === 'inicio') {
+        <span class="month">{{ agora | date: 'MMMM yyyy' }}</span>
       }
-      @if (aba() === 'visao') {
-        <section class="welcome">
-          <div>
-            <span class="pill">SEU BEM-ESTAR FINANCEIRO</span>
-            <h2>Pequenas escolhas.<br />Grandes mudanças.</h2>
-            <p>
-              Conecte uma conta para entender seus gastos e acompanhar sua evolução, no seu ritmo.
-            </p>
-            <a class="primary" routerLink="/banco">＋ Conectar uma conta</a>
-          </div>
-          <div class="welcome-art" aria-hidden="true">
-            <span>✧</span>
-            <div>Neuro<span>WALLet</span><small>Clareza para decidir.</small></div>
-            <span>↗</span>
-          </div>
-        </section>
-        <section class="metrics">
-          <article>
-            <span>CONTAS CONECTADAS</span><strong>{{ contas().length }}</strong>
-            <p>Instituições no seu espaço</p>
-          </article>
-          <article>
-            <span>GASTOS ANALISADOS</span
-            ><strong>{{ dados()['/painel/ralos'] ? (total() | currency: 'BRL') : '—' }}</strong>
-            <p>Resumo das lojas exibidas neste mês</p>
-          </article>
-          <article>
-            <span>ALERTAS RECENTES</span><strong>{{ dados()['/alertas']?.length ?? '—' }}</strong>
-            <p>Informações para suas decisões</p>
-          </article>
-          <article>
-            <span>SUAS CONQUISTAS</span
-            ><strong>{{ dados()['/gamificacao/selos']?.length ?? '—' }}</strong>
-            <p>Cada avanço merece ser reconhecido</p>
-          </article>
-        </section>
-      }
-      @if (aba() === 'contas' || aba() === 'visao') {
-        <section class="panel">
-          <div class="panel-heading">
-            <div>
-              <h2>Minhas contas</h2>
-              <p>Todas as suas conexões em um só lugar.</p>
-            </div>
-            <a routerLink="/banco">＋ Nova conexão</a>
-          </div>
-          @for (conta of contas(); track conta.id) {
-            <div class="bank-row">
-              <span class="bank-icon">▣</span>
-              <div>
-                <strong>{{ conta.instituicao }}</strong><small
-                  >Conexão disponível para importação</small
-                >
-              </div>
-              <button
-                class="secondary"
-                [disabled]="sincronizando() !== null"
-                (click)="sincronizar(conta.id)"
-              >
-                {{ sincronizando() === conta.id ? 'Importando…' : 'Importar transações' }}
-              </button>
-            </div>
-          } @empty {
-            <div class="empty">
-              <span>▣</span>
-              <h3>Vamos conhecer seus hábitos?</h3>
-              <p>
-                Suas contas aparecerão aqui depois da primeira conexão. Você escolhe o que
-                compartilhar.
+    </div>
+    @if (aviso()) {
+      <p class="notice" role="status">{{ aviso() }}</p>
+    }
+    @if (carregando()) {
+      <p class="loading" role="status">Atualizando suas informações…</p>
+    }
+    @switch (aba()) {
+      @case ('inicio') {
+        <div class="dashboard-grid">
+          <div class="column">
+            <section class="card">
+              <h2>Resumo do mês</h2>
+              <p>Ralos invisíveis em {{ agora | date: 'MMMM' }}</p>
+              <strong class="amount">{{ gastos() ? (total() | currency: 'BRL') : '—' }}</strong>
+              <p class="detail">
+                {{
+                  gastos()?.temProxima
+                    ? 'Resumo dos primeiros 100 estabelecimentos.'
+                    : 'Total dos estabelecimentos analisados neste mês.'
+                }}
               </p>
-              <a routerLink="/banco" class="primary">Conectar meu primeiro banco →</a>
-            </div>
+              @if (erros()['gastos']) {
+                <p class="error">{{ erros()['gastos'] }}</p>
+              }
+            </section>
+            <section class="card">
+              <h2>Ralos Invisíveis</h2>
+              @for (loja of gastos()?.resultados?.slice(0, 5) ?? []; track loja.estabelecimentoId) {
+                <div class="bar-row">
+                  <span>{{ loja.nome }}</span>
+                  <div class="track"><span [style.width.%]="barra(loja.total)"></span></div>
+                  <strong>{{ loja.total | currency: 'BRL' }}</strong>
+                </div>
+              } @empty {
+                <p class="empty">
+                  Seus gastos aparecerão aqui após a conexão e a análise do histórico.
+                </p>
+              }
+            </section>
+            <section class="card">
+              <h2>Faturas futuras</h2>
+              <div class="invoice-preview">
+                @for (mes of faturas().slice(0, 3); track mes.mesReferencia) {
+                  <div>
+                    <small>{{ mes.mesReferencia + '-01' | date: 'MMM yyyy' }}</small><strong>{{
+                      mes.valorProjetado | currency: 'BRL'
+                    }}</strong>
+                  </div>
+                } @empty {
+                  <p class="empty">Nenhuma parcela projetada no momento.</p>
+                }
+              </div>
+            </section>
+          </div>
+          <div class="column">
+            <section class="card">
+              <h2>Alertas recentes</h2>
+              @for (item of alertas().slice(0, 2); track item.id) {
+                <article class="mini-alert">
+                  <span class="accent">Padrão de consumo</span>
+                  <p>{{ item.mensagem }}</p>
+                  <small>{{ item.criadoEm | date: 'dd/MM/yyyy' }}</small>
+                </article>
+              } @empty {
+                <p class="empty">
+                  Nenhum alerta identificado. Quando houver um padrão de consumo, ele aparecerá
+                  aqui.
+                </p>
+              }
+            </section>
+            <section class="card">
+              <h2>Suas conexões</h2>
+              @for (conta of contas(); track conta.id) {
+                <div class="list-row">
+                  <span>▣ {{ conta.instituicao }}</span
+                  ><button
+                    class="link-button"
+                    (click)="sincronizar(conta.id)"
+                    [disabled]="ocupado()"
+                  >
+                    Importar
+                  </button>
+                </div>
+              } @empty {
+                <p>Nenhuma conta conectada.</p>
+                <a routerLink="/banco" class="primary">Conectar meu banco →</a>
+              }
+            </section>
+            <section class="card">
+              <h2>Conquistas</h2>
+              <p>
+                <strong class="days">{{ sequencia() }} dias</strong> sem compras fast-fashion na
+                sequência atual
+              </p>
+              <p class="accent">{{ selos().length }} selos conquistados</p>
+              <button class="link-button" (click)="navegar('conquistas')">
+                Ver meu progresso →
+              </button>
+            </section>
+          </div>
+        </div>
+        <div class="quick-actions">
+          <button class="primary" (click)="navegar('gatilhos')">Configurar gatilhos</button
+          ><button class="secondary" (click)="navegar('lista')">Lista branca</button
+          ><button class="secondary" (click)="navegar('exportar')">Exportar CSV ou PDF</button>
+        </div>
+      }
+      @case ('mais') {
+        <section class="card">
+          <h2>Tudo no seu controle</h2>
+          @for (item of atalhos; track item.id) {
+            <button class="shortcut" (click)="navegar(item.id)">
+              <span class="shortcut-icon">{{ item.icone }}</span><span
+                ><strong>{{ item.nome }}</strong
+                ><small>{{ item.descricao }}</small></span
+              ><span class="chevron">›</span>
+            </button>
           }
         </section>
       }
-      <div class="panels">
-        @for (s of secoes; track s.rota) {
-          @if (
-            aba() === s.rota ||
-            (aba() === 'visao' && (s.rota === '/painel/ralos' || s.rota === '/alertas'))
-          ) {
-            <section class="panel">
-              <div class="panel-heading">
-                <h2>{{ s.titulo }}</h2>
-                @if (aba() === 'visao') {
-                  <button class="text-button" (click)="aba.set(s.rota)">Ver detalhes →</button>
-                }
-              </div>
-              @if (erros()[s.rota]) {
-                <div class="empty">
-                  <h3>Não conseguimos carregar</h3>
-                  <p>{{ erros()[s.rota] }}</p>
-                  <button class="secondary" (click)="carregar()">Tentar novamente</button>
+      @case ('alertas') {
+        <button class="link-button section-link" (click)="navegar('gatilhos')">
+          Configurar gatilhos
+        </button>
+        @if (erros()['alertas']) {
+          <p class="error">{{ erros()['alertas'] }}</p>
+        }
+        <div class="dashboard-grid">
+          @for (item of alertas(); track item.id) {
+            <article class="card">
+              <h2>Padrão de consumo identificado</h2>
+              <span class="warning-icon">⚠</span>
+              <p class="lead">{{ item.mensagem }}</p>
+              <p>Projeção até o fim do mês: {{ item.projecao | currency: 'BRL' }}</p>
+              <small>{{ item.criadoEm | date: 'dd/MM/yyyy' }}</small>
+            </article>
+          } @empty {
+            <section class="card empty">
+              <h2>Nenhum alerta por aqui</h2>
+              <p>Os padrões identificados nas transações analisadas aparecerão nesta área.</p>
+            </section>
+          }
+        </div>
+      }
+      @case ('faturas') {
+        <div class="dashboard-grid">
+          <div class="column">
+            <section class="card">
+              <h2>Suas contas</h2>
+              @for (conta of contas(); track conta.id) {
+                <p class="lead">▣ {{ conta.instituicao }}</p>
+              } @empty {
+                <p>Conecte uma conta para começar.</p>
+                <a routerLink="/banco">Conectar banco →</a>
+              }
+            </section>
+            <section class="card">
+              <h2>Como ler sua projeção</h2>
+              <p>
+                Os valores reúnem parcelas de compras já identificadas. Novas compras podem alterar
+                o total. Esta é uma estimativa, não o valor oficial da fatura.
+              </p>
+            </section>
+          </div>
+          <section class="card">
+            <h2>Próximas faturas</h2>
+            @if (erros()['faturas']) {
+              <p class="error">{{ erros()['faturas'] }}</p>
+            }
+            @for (mes of faturas(); track mes.mesReferencia) {
+              <div class="soft-row">
+                <div>
+                  <strong>{{ mes.mesReferencia + '-01' | date: 'MMMM yyyy' }}</strong><small
+                    >Parcelas projetadas do histórico analisado</small
+                  >
                 </div>
-              } @else if (dados()[s.rota] === undefined) {
-                <p class="empty" role="status">Buscando suas informações…</p>
-              } @else {
-                @switch (s.rota) {
-                  @case ('/painel/ralos') {
-                    @for (loja of dados()[s.rota].resultados; track loja.estabelecimentoId) {
-                      <div class="data-row">
-                        <div>
-                          <strong>{{ loja.nome }}</strong><small
-                            >{{ loja.compras }} compras · {{ loja.categoria }}</small
-                          >
-                        </div>
-                        <strong>{{ loja.total | currency: 'BRL' }}</strong>
-                      </div>
-                    } @empty {
-                      <div class="empty">
-                        <span>↗</span>
-                        <h3>Seu mapa de gastos começa aqui</h3>
-                        <p>
-                          Depois de importar e analisar suas transações, você verá os
-                          estabelecimentos com maior gasto do mês.
-                        </p>
-                      </div>
-                    }
-                  }
-                  @case ('/alertas') {
-                    @for (item of dados()[s.rota]; track item.id) {
-                      <div class="data-row">
-                        <div>
-                          <strong>{{ item.mensagem }}</strong><small
-                            >{{ item.criadoEm | date: 'dd/MM/yyyy' }} · Projeção
-                            {{ item.projecao | currency: 'BRL' }}</small
-                          >
-                        </div>
-                      </div>
-                    } @empty {
-                      <div class="empty">
-                        <span>◉</span>
-                        <h3>Nenhum alerta por aqui</h3>
-                        <p>Se identificarmos um padrão que mereça sua atenção, você verá aqui.</p>
-                      </div>
-                    }
-                  }
-                  @case ('/faturas/projecao') {
-                    @for (item of dados()[s.rota]; track item.mesReferencia) {
-                      <div class="data-row">
-                        <strong>{{ item.mesReferencia }}</strong><strong>{{
-                          item.valorProjetado | currency: 'BRL'
-                        }}</strong>
-                      </div>
-                    } @empty {
-                      <div class="empty">
-                        <span>▤</span>
-                        <h3>Sem parcelas projetadas</h3>
-                        <p>
-                          As estimativas aparecem quando há compras parceladas identificadas no
-                          histórico.
-                        </p>
-                      </div>
-                    }
-                  }
-                  @case ('/gamificacao/selos') {
-                    @for (item of dados()[s.rota]; track item.nome) {
-                      <div class="data-row">
-                        <span class="bank-icon">✧</span>
-                        <div>
-                          <strong>{{ item.nome }}</strong><small
-                            >{{ item.criterioDias }} dias · Conquistado em
-                            {{ item.concedidoEm | date: 'dd/MM/yyyy' }}</small
-                          >
-                        </div>
-                      </div>
-                    } @empty {
-                      <div class="empty">
-                        <span>✧</span>
-                        <h3>Cada dia conta</h3>
-                        <p>
-                          Com histórico suficiente, acompanhe suas sequências e conquiste selos de
-                          7, 30 e 90 dias.
-                        </p>
-                      </div>
-                    }
-                  }
-                  @case ('/relatorios') {
-                    @for (item of dados()[s.rota]; track item.mes) {
-                      <article class="report">
-                        <p class="eyebrow">{{ item.mes }}</p>
-                        <h3>Um olhar sobre seu mês</h3>
-                        <p>{{ item.texto }}</p>
-                      </article>
-                    } @empty {
-                      <div class="empty">
-                        <span>▥</span>
-                        <h3>Sua história ainda está começando</h3>
-                        <p>
-                          Os relatórios mensais aparecerão quando houver dados suficientes e a
-                          análise estiver disponível.
-                        </p>
-                      </div>
-                    }
-                  }
+                <strong>{{ mes.valorProjetado | currency: 'BRL' }}</strong>
+              </div>
+            } @empty {
+              <p class="empty">Nenhuma parcela futura identificada.</p>
+            }
+          </section>
+        </div>
+      }
+      @case ('conquistas') {
+        <div class="dashboard-grid">
+          <div class="column">
+            <section class="card">
+              <h2>Dias sem compras Fast-Fashion</h2>
+              <strong class="big-number">{{ sequencia() }}</strong>
+              <p class="lead">dias de escolhas mais conscientes</p>
+              <small>Sequência calculada com dias completos e histórico suficiente.</small>
+            </section>
+            <section class="card">
+              <h2>Seu histórico</h2>
+              @for (dia of dias().slice(0, 15); track dia) {
+                <p>{{ dia | date: 'dd/MM/yyyy' }} · Dia sem compras fast-fashion</p>
+              } @empty {
+                <p class="empty">Seu histórico aparecerá após a análise de dias completos.</p>
+              }
+            </section>
+          </div>
+          <div class="badge-grid">
+            @for (selo of selos(); track selo.nome) {
+              <section class="card">
+                <h2>{{ selo.nome }}</h2>
+                <span class="badge-icon">♧</span>
+                <p>{{ selo.criterioDias }} dias sem compras fast-fashion.</p>
+                <small>Conquistado em {{ selo.concedidoEm | date: 'dd/MM/yyyy' }}</small>
+              </section>
+            } @empty {
+              <section class="card">
+                <h2>Um dia de cada vez</h2>
+                <span class="badge-icon">✧</span>
+                <p>
+                  Continue acompanhando suas escolhas. As metas de sequência são 7, 30 e 90 dias.
+                </p>
+              </section>
+            }
+          </div>
+        </div>
+      }
+      @case ('gatilhos') {
+        <div class="dashboard-grid">
+          <section class="card">
+            <h2>{{ editandoRegra ? 'Editar regra' : 'Criar regra personalizada' }}</h2>
+            <form #regraForm="ngForm" (ngSubmit)="regraForm.valid && salvarRegra()">
+              <label
+                >Valor máximo de cada compra (R$)<input
+                  type="number"
+                  name="unitario"
+                  [(ngModel)]="regra.valorUnitarioMax"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="Opcional" /></label
+              ><label
+                >Valor máximo acumulado (R$)<input
+                  type="number"
+                  name="acumulado"
+                  [(ngModel)]="regra.limiteAcumulado"
+                  required
+                  min="0.01"
+                  step="0.01" /></label
+              ><label
+                >Janela em dias<input
+                  type="number"
+                  name="dias"
+                  [(ngModel)]="regra.janelaDias"
+                  required
+                  min="1"
+                  max="90"
+                  step="1" /></label
+              ><label
+                >Quantidade mínima de compras<input
+                  type="number"
+                  name="quantidade"
+                  [(ngModel)]="regra.qtdMinCompras"
+                  required
+                  min="1"
+                  max="10000"
+                  step="1" /></label
+              ><button class="primary" [disabled]="ocupado() || regraForm.invalid">
+                {{ ocupado() ? 'Salvando…' : 'Salvar regra' }}
+              </button>
+              @if (editandoRegra) {
+                <button type="button" class="link-button" (click)="editandoRegra = null">
+                  Cancelar edição
+                </button>
+              }
+            </form>
+          </section>
+          <div class="column">
+            <section class="card">
+              <h2>Regra padrão</h2>
+              <p class="lead">
+                3 ou mais compras no mesmo estabelecimento, cuja soma seja de até R$ 100, em 7 dias.
+              </p>
+              <small>Aplicada quando você não possui regras personalizadas.</small>
+            </section>
+            <section class="card">
+              <h2>Minhas regras</h2>
+              @if (erros()['regras']) {
+                <p class="error">{{ erros()['regras'] }}</p>
+              }
+              @for (r of regras(); track r.id) {
+                @if (!r.padrao) {
+                  <article class="rule">
+                    <p>
+                      Compras
+                      {{
+                        r.parametros.valorUnitarioMax
+                          ? 'abaixo de ' + (r.parametros.valorUnitarioMax | currency: 'BRL')
+                          : ''
+                      }}
+                      que somam mais de {{ r.parametros.limiteAcumulado | currency: 'BRL' }}.
+                    </p>
+                    <small
+                      >{{ r.parametros.qtdMinCompras }} compras ou mais · Janela de
+                      {{ r.parametros.janelaDias }} dias</small
+                    >
+                    <div class="row-actions">
+                      <button class="link-button" (click)="editarRegra(r)">Editar</button
+                      ><button
+                        class="link-button"
+                        [disabled]="ocupado()"
+                        (click)="excluir('/regras', r.id)"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </article>
+                } @else {
+                  <p class="empty">Você está utilizando a regra padrão.</p>
                 }
               }
             </section>
+          </div>
+        </div>
+      }
+      @case ('lista') {
+        <div class="dashboard-grid">
+          <section class="card">
+            <h2>{{ editandoExcecao ? 'Editar exceção' : 'Adicionar estabelecimento' }}</h2>
+            <form
+              #listaForm="ngForm"
+              (ngSubmit)="listaForm.valid && excecao.estabelecimentoId > 0 && salvarExcecao()"
+            >
+              <label
+                >Estabelecimento<select
+                  name="loja"
+                  [(ngModel)]="excecao.estabelecimentoId"
+                  required
+                >
+                  <option [ngValue]="0" disabled>Selecione um estabelecimento</option>
+                  @for (loja of lojas(); track loja.id) {
+                    <option [ngValue]="loja.id">{{ loja.nome }}</option>
+                  }
+                </select></label
+              ><label
+                >Motivo<input
+                  name="motivo"
+                  [(ngModel)]="excecao.motivo"
+                  required
+                  maxlength="255"
+                  placeholder="Ex.: despesa recorrente" /></label
+              ><button
+                class="primary"
+                [disabled]="ocupado() || listaForm.invalid || excecao.estabelecimentoId === 0"
+              >
+                Salvar exceção
+              </button>
+              @if (editandoExcecao) {
+                <button type="button" class="link-button" (click)="editandoExcecao = null">
+                  Cancelar edição
+                </button>
+              }
+            </form>
+            @if (!lojas().length) {
+              <p class="empty">
+                Os estabelecimentos ficam disponíveis após a importação e a classificação do
+                histórico.
+              </p>
+            }
+          </section>
+          <section class="card">
+            <h2>Minha lista branca</h2>
+            @if (erros()['lista']) {
+              <p class="error">{{ erros()['lista'] }}</p>
+            }
+            @for (item of excecoes(); track item.id) {
+              <article class="rule">
+                <h3>{{ nomeLoja(item.estabelecimentoId) }}</h3>
+                <p>{{ item.motivo }}</p>
+                <div class="row-actions">
+                  <button class="link-button" (click)="editarExcecao(item)">Editar</button
+                  ><button
+                    class="link-button"
+                    [disabled]="ocupado()"
+                    (click)="excluir('/lista-branca', item.id)"
+                  >
+                    Remover
+                  </button>
+                </div>
+              </article>
+            } @empty {
+              <p class="empty">Nenhum estabelecimento nas exceções.</p>
+            }
+          </section>
+        </div>
+      }
+      @case ('sumario') {
+        <label class="month-picker"
+          >Mês do relatório<select [(ngModel)]="mesRelatorio">
+            @for (r of relatorios(); track r.mes) {
+              <option [value]="r.mes">{{ r.mes }}</option>
+            }
+          </select></label
+        >
+        @if (relatorioAtual(); as r) {
+          <div class="dashboard-grid">
+            <section class="card">
+              <h2>Um mês de pequenas escolhas</h2>
+              <span class="accent">Texto gerado por IA</span>
+              <p class="report-text">{{ r.texto }}</p>
+            </section>
+            <div class="column">
+              <section class="card">
+                <h2>Principais vazamentos</h2>
+                @for (loja of r.maioresVazamentos; track loja.estabelecimento) {
+                  <div class="soft-row">
+                    <span>{{ loja.estabelecimento }}</span><strong>{{
+                      loja.total | currency: 'BRL'
+                    }}</strong>
+                  </div>
+                }
+              </section>
+              <button class="primary" (click)="navegar('exportar')">Exportar</button>
+            </div>
+          </div>
+        } @else {
+          <section class="card empty">
+            <h2>Seu relatório ainda está sendo construído</h2>
+            <p>
+              Os sumários mensais dependem de histórico analisado e da integração com IA
+              configurada.
+            </p>
+          </section>
+        }
+      }
+      @case ('exportar') {
+        <div class="dashboard-grid">
+          <div class="column">
+            <section class="card">
+              <h2>Formato</h2>
+              <label class="radio-option" [class.selected]="formato === 'csv'"
+                ><input type="radio" name="formato" value="csv" [(ngModel)]="formato" /><span
+                  ><strong>CSV</strong><small>Para organizar os dados em planilhas.</small></span
+                ></label
+              ><label class="radio-option" [class.selected]="formato === 'pdf'"
+                ><input type="radio" name="formato" value="pdf" [(ngModel)]="formato" /><span
+                  ><strong>PDF</strong><small>Para consultar e compartilhar a leitura.</small></span
+                ></label
+              >
+            </section>
+            <section class="card">
+              <h2>Conteúdo</h2>
+              <p>Sumários mensais disponíveis e seus principais gastos.</p>
+              <small>A exportação inclui todos os relatórios disponíveis da sua conta.</small>
+            </section>
+          </div>
+          <section class="card">
+            <h2>Seus dados, com você</h2>
+            <span class="download-icon">↓</span>
+            <h3>Sumários mensais</h3>
+            <p>
+              Formato {{ formato.toUpperCase() }} · {{ relatorios().length }} relatórios disponíveis
+            </p>
+            <p>Inclui os textos dos relatórios e os principais estabelecimentos identificados.</p>
+            <button
+              class="primary full"
+              (click)="exportar()"
+              [disabled]="ocupado() || !relatorios().length"
+            >
+              {{ ocupado() ? 'Preparando arquivo…' : 'Exportar' }}</button><small
+              >Os dados exportados são pessoais. Compartilhe com cuidado.</small
+            >
+          </section>
+        </div>
+      }
+      @case ('contas') {
+        <section class="card">
+          <div class="section-heading">
+            <h2>Minhas conexões</h2>
+            <a routerLink="/banco" class="primary">＋ Conectar conta</a>
+          </div>
+          @if (erros()['contas']) {
+            <p class="error">{{ erros()['contas'] }}</p>
           }
+          @for (conta of contas(); track conta.id) {
+            <div class="list-row">
+              <strong>▣ {{ conta.instituicao }}</strong
+              ><button class="secondary" (click)="sincronizar(conta.id)" [disabled]="ocupado()">
+                Importar histórico
+              </button>
+            </div>
+          } @empty {
+            <p class="empty">
+              Nenhuma conta conectada. Escolha sua instituição para começar a acompanhar suas
+              informações.
+            </p>
+          }
+        </section>
+      }
+      @case ('saude') {
+        <div class="dashboard-grid">
+          <section class="card">
+            <h2>Endpoints REST</h2>
+            <strong class="amount">{{ saude() }}</strong>
+            <p>Verificação da API e dos componentes informados pelo servidor.</p>
+            <button class="secondary" (click)="consultarSaude()">Atualizar</button>
+          </section>
+          <section class="card">
+            <h2>Integrações externas</h2>
+            <p class="lead">Status não informado</p>
+            <p>
+              A disponibilidade da API não confirma a conexão real com os provedores de Open Finance
+              e IA.
+            </p>
+          </section>
+        </div>
+      }
+    }
+    <footer class="page-footer">
+      <span>NeuroWALLet · Seu dinheiro, com mais intenção.</span>
+      <div>
+        <a routerLink="/termos-de-uso">Termos de uso</a
+        ><a routerLink="/politica-de-privacidade">Privacidade</a>
+        @if (!admin()) {
+          <button class="link-button" (click)="carregar()" [disabled]="carregando()">
+            Atualizar dados
+          </button>
         }
       </div>
-      <footer>
-        NeuroWALLet · Seu ritmo, suas escolhas.
-        <div>
-          <a routerLink="/termos-de-uso">Termos de uso</a
-          ><a routerLink="/politica-de-privacidade">Privacidade</a>
-        </div>
-      </footer>
-    </main>
-  </div>
+    </footer>
+  </main>
 </div>
