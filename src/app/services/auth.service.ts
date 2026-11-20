@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, tap, finalize, of } from 'rxjs';
+import { Observable, map, tap, finalize, of, timeout } from 'rxjs';
 import { API } from '../core/config';
 import {
   CadastroPedido,
@@ -27,24 +27,31 @@ export class AuthService {
         senha: pedido.senha,
       })
       .pipe(
+        timeout(20000),
         tap((r) => this.local.desafio(r.tokenPre2fa, r.configurarTotp)),
         map((r) => ({ proximo: r.configurarTotp ? 'ativar-2fa' : 'verificar-2fa' })),
       );
   }
   cadastrar(pedido: CadastroPedido): Observable<void> {
-    return this.http.post<void>(this.base + '/cadastro', pedido);
+    return this.http.post<void>(this.base + '/cadastro', pedido).pipe(timeout(20000));
   }
   iniciar2fa(): Observable<Iniciar2faResposta> {
     return this.http
       .post<{ segredo: string; qrPngBase64: string }>(this.base + '/2fa/ativar', {})
-      .pipe(map((r) => ({ chave: r.segredo, otpauthUrl: '', qrPngBase64: r.qrPngBase64 })));
+      .pipe(
+        timeout(20000),
+        map((r) => ({ chave: r.segredo, otpauthUrl: '', qrPngBase64: r.qrPngBase64 })),
+      );
   }
   verificar2fa(codigo: string): Observable<Tokens> {
     return this.http
       .post<Tokens>(this.base + '/2fa/' + (this.local.configurar ? 'confirmar' : 'verificar'), {
         codigo,
       })
-      .pipe(tap((r) => this.local.salvar(r)));
+      .pipe(
+        timeout(20000),
+        tap((r) => this.local.salvar(r)),
+      );
   }
   sessao(): Observable<SessaoResposta> {
     return this.local.accessToken

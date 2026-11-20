@@ -65,12 +65,12 @@ export const routes: Routes = [
   {
     path: 'termos-de-uso',
     data: { titulo: 'Termos de Uso' },
-    loadComponent: () => import('./pages/em-construcao/em-construcao').then((m) => m.EmConstrucao),
+    loadComponent: () => import('./pages/legal/legal').then((m) => m.Legal),
   },
   {
     path: 'politica-de-privacidade',
     data: { titulo: 'Política de Privacidade' },
-    loadComponent: () => import('./pages/em-construcao/em-construcao').then((m) => m.EmConstrucao),
+    loadComponent: () => import('./pages/legal/legal').then((m) => m.Legal),
   },
   {
     path: 'recuperar-senha',

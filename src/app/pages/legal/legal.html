@@ -1,0 +1,122 @@
+<main>
+  <header>
+    <a routerLink="/login" class="brand"><img src="/images/Logo.png" alt="" />NeuroWALLet</a
+    ><a routerLink="/cadastro">Voltar ao cadastro →</a>
+  </header>
+  <div class="legal-layout">
+    <aside>
+      <p>TRANSPARÊNCIA</p>
+      <a routerLink="/termos-de-uso">Termos de uso</a
+      ><a routerLink="/politica-de-privacidade">Privacidade</a
+      ><a routerLink="/login">Voltar ao login</a>
+    </aside>
+    <article>
+      <p class="eyebrow">SEUS DADOS, SUAS ESCOLHAS</p>
+      <h1>{{ privacidade ? 'Política de privacidade' : 'Termos de uso' }}</h1>
+      <p class="intro">
+        Entenda como o NeuroWALLet funciona e o que acontece com as informações que você
+        compartilha.
+      </p>
+      <div class="notice">
+        Texto de exemplo para o projeto acadêmico · versão de 20/11/2026. A equipe ainda deve
+        revisar este documento e informar o responsável e o canal de atendimento antes da
+        disponibilização pública.
+      </div>
+      @if (privacidade) {
+        <h2>1. Quais informações utilizamos</h2>
+        <p>
+          Nome, e-mail, senha protegida e dados de autenticação permitem criar e proteger sua conta.
+          Quando você autoriza uma conexão bancária, o projeto pode receber informações de contas e
+          transações, como instituição, valores, datas e descrições.
+        </p>
+        <h2>2. Para que os dados são usados</h2>
+        <p>
+          Para autenticar seu acesso, organizar o histórico financeiro, identificar padrões de
+          compras e apresentar alertas, projeções, selos e relatórios. Os resultados são estimativas
+          e dependem dos dados disponíveis.
+        </p>
+        <h2>3. Conexão com instituições financeiras</h2>
+        <p>
+          A autorização acontece pelo ambiente da Pluggy e da instituição financeira. O NeuroWALLet
+          usa as informações disponibilizadas para análise. O fluxo não permite fazer pagamentos ou
+          transferências pelo projeto. Consulte também as condições apresentadas pelos provedores
+          durante a conexão.
+        </p>
+        <h2>4. Processamento e inteligência artificial</h2>
+        <p>
+          Com as integrações configuradas, serviços externos podem processar dados necessários ao
+          funcionamento. A classificação por IA usa referências comerciais reconhecidas, valores e
+          referências aleatórias, sem enviar nome ou e-mail do cliente nesse fluxo. Informações
+          agregadas podem ser usadas nos relatórios.
+        </p>
+        <h2>5. Sessão e proteção</h2>
+        <p>
+          O navegador mantém tokens de acesso na sessão da aba para autenticar chamadas. O projeto
+          usa senha protegida, autenticação em duas etapas e criptografia de campos sensíveis.
+          Guarde seus códigos de recuperação e não compartilhe seus dados de acesso.
+        </p>
+        <h2>6. Suas escolhas</h2>
+        <p>
+          Conectar uma conta bancária é opcional. Você pode consultar o painel sem vínculo, com
+          áreas vazias. Para interromper o compartilhamento bancário, utilize os controles de
+          consentimento disponibilizados pela instituição. Solicitações sobre correção, exclusão e
+          uso dos dados devem ser encaminhadas à equipe responsável.
+        </p>
+        <h2>7. Retenção e contato</h2>
+        <p>
+          O prazo de retenção, a identificação do responsável e o canal de solicitações ainda serão
+          definidos pela equipe. Não utilize dados bancários reais no ambiente de demonstração antes
+          dessa definição.
+        </p>
+      } @else {
+        <h2>1. Sobre o projeto</h2>
+        <p>
+          O NeuroWALLet é um projeto acadêmico de organização e análise de hábitos financeiros. Seu
+          objetivo é ajudar você a reconhecer padrões de consumo e acompanhar informações das contas
+          que decidir conectar.
+        </p>
+        <h2>2. Cadastro e segurança</h2>
+        <p>
+          Informe dados corretos e mantenha sua senha, autenticador e códigos de recuperação em
+          segurança. Você é responsável por não compartilhar suas credenciais. O acesso às
+          funcionalidades protegidas exige autenticação em duas etapas.
+        </p>
+        <h2>3. Conexão bancária opcional</h2>
+        <p>
+          A vinculação depende de sua autorização e da disponibilidade da instituição e da Pluggy. O
+          projeto consulta dados disponibilizados para análise e não realiza pagamentos,
+          transferências ou bloqueios de cartões.
+        </p>
+        <h2>4. Alertas e estimativas</h2>
+        <p>
+          Classificações, projeções e relatórios podem conter erros, atrasos ou informações
+          incompletas. Eles auxiliam sua organização pessoal e não substituem uma avaliação
+          individual das suas decisões financeiras.
+        </p>
+        <h2>5. Uso responsável</h2>
+        <p>
+          Não utilize contas de outras pessoas sem autorização, não tente acessar informações de
+          terceiros e não interfira na operação do serviço. Em demonstrações e testes, prefira
+          instituições de teste e dados fictícios.
+        </p>
+        <h2>6. Disponibilidade e alterações</h2>
+        <p>
+          Por estar em desenvolvimento, o projeto pode passar por manutenção, mudanças ou
+          interrupções. Integrações externas dependem de credenciais e da disponibilidade dos
+          provedores.
+        </p>
+        <h2>7. Privacidade e atendimento</h2>
+        <p>
+          Leia a <a routerLink="/politica-de-privacidade">política de privacidade</a> para conhecer
+          o uso dos dados. A equipe ainda deve definir e publicar o responsável pelo serviço e o
+          canal de atendimento antes de receber usuários em ambiente público.
+        </p>
+      }
+      <footer>
+        NeuroWALLet · Mais clareza para suas escolhas.<br /><a routerLink="/cadastro"
+          >Voltar ao cadastro</a
+        >
+      </footer>
+    </article>
+  </div>
+</main>

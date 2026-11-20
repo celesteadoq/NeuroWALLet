@@ -33,3 +33,9 @@
 .code-inputs input.invalido {
   border-color: var(--erro);
 }
+
+.code-inputs input {
+  width: 0;
+  flex: 1 1 0;
+  min-width: 0;
+}

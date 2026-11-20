@@ -15,6 +15,9 @@ export function mensagemDeErro(
   usarMensagemDoServidor = false,
 ): string {
   if (!(erro instanceof HttpErrorResponse)) return padrao;
+  if (erro.status === 429) return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+  if (erro.status >= 500)
+    return 'O serviço está indisponível no momento. Tente novamente em instantes.';
   if (erro.status === 0) return SEM_CONEXAO;
   if (usarMensagemDoServidor) {
     const corpo = erro.error as Partial<ErroApi> | null;
