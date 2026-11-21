@@ -51,12 +51,24 @@ export class Banco {
   private readonly router = inject(Router);
   protected readonly enviando = signal(false);
   protected readonly erro = signal<string | null>(null);
-  protected continuar() {
+  protected readonly demonstracao = signal(false);
+  protected readonly ambienteCarregado = signal(false);
+  constructor() {
+    this.banco.ambiente().subscribe({
+      next: (r) => { this.demonstracao.set(r.demonstracao); this.ambienteCarregado.set(true); },
+      error: () => this.erro.set('Não foi possível consultar o ambiente. Atualize a página.'),
+    });
+  }
+  protected continuar(instituicao?: string) {
     if (this.enviando()) return;
     this.enviando.set(true);
     this.erro.set(null);
-    this.banco.iniciarConexao().subscribe({
+    this.banco.iniciarConexao(instituicao).subscribe({
       next: async (r) => {
+        if (this.demonstracao()) {
+          void this.router.navigateByUrl('/banco/retorno');
+          return;
+        }
         try {
           await carregar();
           new window.PluggyConnect({

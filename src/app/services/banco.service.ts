@@ -12,14 +12,17 @@ export class BancoService {
   listar() {
     return this.http.get<Conta[]>(API.baseUrl + '/contas').pipe(timeout(20000));
   }
-  iniciarConexao() {
+  ambiente() {
+    return this.http.get<{ demonstracao: boolean }>(API.baseUrl + '/openfinance/ambiente').pipe(timeout(10000));
+  }
+  iniciarConexao(banco?: string) {
     return this.listar().pipe(
       tap((contas) =>
         sessionStorage.setItem('nw-contas-antes', JSON.stringify(contas.map((c) => c.id))),
       ),
       switchMap(() =>
         this.http.post<{ accessToken: string; expiraEm: string }>(
-          API.baseUrl + '/openfinance/consentimentos',
+          API.baseUrl + '/openfinance/consentimentos' + (banco ? '?banco=' + encodeURIComponent(banco) : ''),
           {},
         ),
       ),

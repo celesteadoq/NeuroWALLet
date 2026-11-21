@@ -47,7 +47,7 @@
             <span>1</span>
             <div>
               <strong>Escolha sua instituição</strong>
-              <p>A lista de bancos abre no Pluggy Connect.</p>
+              <p>{{ demonstracao() ? 'Escolha Aurora ou Horizonte abaixo.' : 'A lista de bancos abre no Pluggy Connect.' }}</p>
             </div>
           </li>
           <li>
@@ -68,10 +68,16 @@
         @if (erro()) {
           <p class="erro" role="alert">{{ erro() }}</p>
         }
-        <button (click)="continuar()" [disabled]="enviando()">
+        @if (demonstracao()) {
+          <p><strong>Ambiente de demonstração</strong> — bancos e compras fictícios. A importação e a análise são processadas pelo backend e pelo Gemini.</p>
+          <button (click)="continuar('aurora')" [disabled]="enviando()">Conectar Banco Aurora</button>
+          <button (click)="continuar('horizonte')" [disabled]="enviando()">Conectar Banco Horizonte</button>
+        } @else {
+        <button (click)="continuar()" [disabled]="enviando() || !ambienteCarregado()">
           {{ enviando() ? 'Abrindo ambiente seguro…' : 'Escolher meu banco' }} →
         </button>
-        <div class="secure">◇ Conexão com autorização via Pluggy</div>
+        }
+        <div class="secure">◇ {{ demonstracao() ? 'Dados fictícios enviados pela API do banco de demonstração' : 'Conexão com autorização via Pluggy' }}</div>
         <a routerLink="/inicio" class="skip">Prefiro explorar o painel primeiro</a>
         <footer>
           Ao continuar, confira nossos <a routerLink="/termos-de-uso">termos</a> e a
