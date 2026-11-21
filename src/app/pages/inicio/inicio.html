@@ -4,11 +4,6 @@
       ><img src="/images/Logo.png" alt="" />NeuroWALLet</a
     >
     <div class="header-actions">
-      @if (!admin()) {
-        <button (click)="sincronizar()" [disabled]="ocupado()">
-          ↻ <span>{{ ocupado() ? 'Processando…' : 'Sincronizar' }}</span>
-        </button>
-      }
       <button (click)="sair()">↪ Sair</button
       ><button
         class="menu-toggle"
@@ -31,13 +26,7 @@
           {{ item.nome }}
         </button>
       }
-      <button
-        class="mobile-utility"
-        (click)="sincronizar(); menuAberto.set(false)"
-        [disabled]="ocupado()"
-      >
-        ↻ Sincronizar</button
-      ><button class="mobile-utility" (click)="sair()">↪ Sair</button>
+      <button class="mobile-utility" (click)="sair()">↪ Sair</button>
     </nav>
   }
   <main>
@@ -71,40 +60,24 @@
       }
     </div>
     @if (aviso()) {
-      <p class="notice" role="status">{{ aviso() }}</p>
+      <p class="notice" [class.notice-success]="tipoAviso() === 'sucesso'" [class.notice-error]="tipoAviso() === 'erro'" [class.notice-warning]="tipoAviso() === 'alerta'" role="status">{{ aviso() }}</p>
     }
     @if (carregando()) {
       <p class="loading" role="status">Atualizando suas informações…</p>
     }
     @switch (aba()) {
       @case ('inicio') {
-        <section class="card">
-          <h2>Histórico importado</h2>
-          @if (importacao(); as r) {
-            <p><strong>{{ r.importadas }} transações importadas</strong> · {{ r.classificadas }} classificadas · {{ r.pendentes }} aguardando classificação · {{ r.foraDaAnalise }} fora da análise</p>
-            <p class="detail">O total importado inclui todos os lançamentos. Ralos Invisíveis mostra apenas compras que formam padrões nas suas regras.</p>
-            @if (r.importadas > 0 && r.classificadas === 0 && r.pendentes === 0) {
-              <p>Nenhuma compra passou pelos filtros de análise. Os lançamentos foram importados, mas não geram padrões de consumo.</p>
-            }
-            <button class="secondary" (click)="analisar()" [disabled]="ocupado() || r.classificadas === 0">Atualizar análise</button>
-          }
-          @if (erros()['importacao']) { <p class="error">{{ erros()['importacao'] }}</p> }
-        </section>
         <div class="dashboard-grid">
           <div class="column">
             <section class="card">
               <h2>Resumo do mês</h2>
-              <p>Ralos invisíveis em {{ agora | date: 'MMMM' }}</p>
-              <strong class="amount">{{ gastos() ? (total() | currency: 'BRL') : '—' }}</strong>
+              <p>Saídas importadas em {{ agora | date: 'MMMM' }}</p>
+              <strong class="amount">{{ mensal() ? (mensal()!.saidas | currency: 'BRL') : '—' }}</strong>
               <p class="detail">
-                {{
-                  gastos()?.temProxima
-                    ? 'Resumo dos primeiros 100 estabelecimentos.'
-                    : 'Total dos estabelecimentos analisados neste mês.'
-                }}
+                {{ mensal()?.transacoes ?? 0 }} lançamentos no mês · {{ total() | currency: 'BRL' }} em padrões de consumo identificados.
               </p>
-              @if (erros()['gastos']) {
-                <p class="error">{{ erros()['gastos'] }}</p>
+              @if (erros()['mensal']) {
+                <p class="error">{{ erros()['mensal'] }}</p>
               }
             </section>
             <section class="card">
@@ -117,7 +90,7 @@
                 </div>
               } @empty {
                 <p class="empty">
-                  Seus gastos aparecerão aqui após a conexão e a análise do histórico.
+                  Nenhum padrão identificado no momento. A análise é atualizada automaticamente após a sincronização.
                 </p>
               }
             </section>
@@ -156,14 +129,7 @@
               <h2>Suas conexões</h2>
               @for (conta of contas(); track conta.id) {
                 <div class="list-row">
-                  <span>▣ {{ conta.instituicao }}</span
-                  ><button
-                    class="link-button"
-                    (click)="sincronizar(conta.id)"
-                    [disabled]="ocupado()"
-                  >
-                    Importar
-                  </button>
+                  <span>▣ {{ conta.instituicao }}</span><small>Sincronização automática</small>
                 </div>
               } @empty {
                 <p>Nenhuma conta conectada.</p>
@@ -473,6 +439,11 @@
         </div>
       }
       @case ('sumario') {
+        <section class="card report-actions">
+          <label>Mês do relatório<input type="month" [(ngModel)]="mesGeracao" [max]="mesAtual" /></label>
+          <button class="primary" (click)="gerarRelatorio()" [disabled]="ocupado() || !mesGeracao">{{ ocupado() ? 'Gerando relatório…' : 'Criar relatório' }}</button>
+          <small>Escolha um mês com histórico sincronizado para gerar sua leitura financeira.</small>
+        </section>
         <label class="month-picker"
           >Mês do relatório<select [(ngModel)]="mesRelatorio">
             @for (r of relatorios(); track r.mes) {
@@ -562,10 +533,7 @@
           }
           @for (conta of contas(); track conta.id) {
             <div class="list-row">
-              <strong>▣ {{ conta.instituicao }}</strong
-              ><button class="secondary" (click)="sincronizar(conta.id)" [disabled]="ocupado()">
-                Importar histórico
-              </button>
+              <strong>▣ {{ conta.instituicao }}</strong><span>Sincronização automática ativa</span>
             </div>
           } @empty {
             <p class="empty">

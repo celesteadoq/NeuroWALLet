@@ -64,6 +64,9 @@ export interface Excecao {
 @Injectable({ providedIn: 'root' })
 export class PainelService {
   private readonly http = inject(HttpClient);
+  gerarRelatorio(mes: string) {
+    return this.http.post<Relatorio[]>('/api/relatorios?mes=' + encodeURIComponent(mes), {}).pipe(timeout(60000));
+  }
   analisar() {
     return this.http.post<Importacao>('/api/painel/analisar', {}).pipe(timeout(20000));
   }

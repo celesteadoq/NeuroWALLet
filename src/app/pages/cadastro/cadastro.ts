@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   AbstractControl,
   FormBuilder,
@@ -77,7 +78,9 @@ export class Cadastro {
           this.enviando.set(false);
 
           this.erro.set(
-            mensagemDeErro(erro, 'Não foi possível criar a conta. Tente novamente.', true),
+            erro instanceof HttpErrorResponse && erro.status === 409
+              ? 'Este e-mail já possui uma conta. Entre ou recupere sua senha.'
+              : mensagemDeErro(erro, 'Não foi possível criar a conta. Tente novamente.', true),
           );
         },
       });

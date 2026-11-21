@@ -3,7 +3,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { finalize, forkJoin } from 'rxjs';
+import { finalize, timer } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { BancoService, Conta } from '../../services/banco.service';
 import {
@@ -17,7 +17,6 @@ import {
   Parametros,
   Loja,
   Excecao,
-  Importacao,
 } from '../../services/painel.service';
 import { mensagemDeErro } from '../../core/erros';
 @Component({
@@ -35,6 +34,11 @@ export class Inicio {
   protected readonly aba = signal('inicio');
   protected readonly menuAberto = signal(false);
   protected readonly aviso = signal('');
+  protected readonly tipoAviso = signal<'info' | 'sucesso' | 'erro' | 'alerta'>('info');
+  protected readonly mensal = signal<{saidas: number; transacoes: number} | null>(null);
+  private atualizando = false;
+  protected readonly mesAtual = new Intl.DateTimeFormat('en-CA', {timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit'}).format(new Date());
+  protected mesGeracao = this.mesAtual;
   protected readonly ocupado = signal(false);
   protected readonly carregando = signal(false);
   protected readonly erros = signal<Record<string, string>>({});
@@ -42,7 +46,6 @@ export class Inicio {
   protected readonly saude = signal('Aguardando consulta');
   protected readonly contas = signal<Conta[]>([]);
   protected readonly gastos = signal<Pagina | null>(null);
-  protected readonly importacao = signal<Importacao | null>(null);
   protected readonly alertas = signal<Alerta[]>([]);
   protected readonly faturas = signal<Fatura[]>([]);
   protected readonly selos = signal<Selo[]>([]);
@@ -125,6 +128,7 @@ export class Inicio {
     this.aba.set(id);
     this.menuAberto.set(false);
     this.aviso.set('');
+    this.tipoAviso.set('info');
   }
   protected total() {
     return (this.gastos()?.resultados ?? []).reduce((s, l) => s + Number(l.total), 0);
@@ -157,6 +161,9 @@ export class Inicio {
   }
   constructor() {
     afterNextRender(() => {
+      timer(15000, 15000).pipe(takeUntilDestroyed(this.destroy)).subscribe(() => {
+        if (!this.admin() && !this.ocupado()) this.carregar(true);
+      });
       this.api.get<{ id: number; papel: string }>('/usuario/me').subscribe({
         next: (p) => {
           this.admin.set(p.papel === 'SYSADMIN');
@@ -165,7 +172,7 @@ export class Inicio {
             this.consultarSaude();
           } else this.carregar();
         },
-        error: (e) => this.aviso.set(mensagemDeErro(e, 'Não foi possível carregar o perfil.')),
+        error: (e) => this.erroAviso(mensagemDeErro(e, 'Não foi possível carregar o perfil.')),
       });
     });
   }
@@ -177,15 +184,13 @@ export class Inicio {
         error: () => this.saude.set('Não foi possível consultar'),
       });
   }
-  protected carregar() {
-    this.carregando.set(true);
+  protected carregar(silencioso = false) {
+    if (this.atualizando) return;
+    this.atualizando = true;
+    if (!silencioso) this.carregando.set(true);
     this.erros.set({});
     const tarefas = [
-      {
-        id: 'importacao',
-        obs: this.api.get<Importacao>('/painel/importacao'),
-        set: (r: Importacao) => this.importacao.set(r),
-      },
+      { id:'mensal', obs:this.api.get<{saidas:number;transacoes:number}>('/painel/resumo-mensal'), set:(r:{saidas:number;transacoes:number})=>this.mensal.set(r) },
       {
         id: 'gastos',
         obs: this.api.get<Pagina>('/painel/ralos?tamanho=100'),
@@ -242,7 +247,7 @@ export class Inicio {
         .pipe(
           takeUntilDestroyed(this.destroy),
           finalize(() => {
-            if (--restantes === 0) this.carregando.set(false);
+            if (--restantes === 0) { this.carregando.set(false); this.atualizando = false; }
           }),
         )
         .subscribe({
@@ -258,46 +263,26 @@ export class Inicio {
         });
     }
   }
-  protected sincronizar(id?: number) {
-    if (this.ocupado()) return;
-    const contas = id ? this.contas().filter((c) => c.id === id) : this.contas();
-    if (!contas.length) {
-      this.aviso.set('Conecte uma conta bancária para importar seu histórico.');
-      return;
-    }
-    this.ocupado.set(true);
-    forkJoin(contas.map((c) => this.banco.sincronizar(c.id)))
-      .pipe(finalize(() => this.ocupado.set(false)))
-      .subscribe({
-        next: (r) => {
-          this.carregar();
-          this.aviso.set(
-            r.reduce((n, v) => n + v.novasTransacoes, 0) +
-              ' novas transações importadas. A classificação pode levar alguns instantes.',
-          );
-        },
-        error: (e) => {
-          this.carregar();
-          this.aviso.set(
-            mensagemDeErro(
-              e,
-              'A importação não foi concluída para todas as contas. Confira a conexão e o limite diário.',
-            ),
-          );
-        },
-      });
+  private erroAviso(texto: string) {
+    this.tipoAviso.set('erro'); this.aviso.set(texto);
   }
-  protected analisar() {
-    if (this.ocupado()) return;
+  private sucessoAviso(texto: string) {
+    this.tipoAviso.set('sucesso'); this.aviso.set(texto);
+  }
+  protected gerarRelatorio() {
+    if (this.ocupado() || !this.mesGeracao) return;
     this.ocupado.set(true);
-    this.api.analisar().pipe(finalize(() => this.ocupado.set(false))).subscribe({
-      next: (r) => {
-        this.carregar();
-        this.aviso.set(r.pendentes > 0
-          ? 'Há transações aguardando classificação. Aguarde e atualize a análise novamente.'
-          : 'Análise atualizada. Os padrões encontrados aparecem em Ralos Invisíveis.');
+    this.api.gerarRelatorio(this.mesGeracao).pipe(finalize(() => this.ocupado.set(false))).subscribe({
+      next: r => {
+        this.relatorios.set(r); this.mesRelatorio = this.mesGeracao;
+        this.sucessoAviso('Relatório criado. Você já pode consultar e exportar.');
       },
-      error: (e) => this.aviso.set(mensagemDeErro(e, 'Não foi possível atualizar a análise.')),
+      error: e => {
+        this.tipoAviso.set(e.status === 409 ? 'alerta' : 'erro');
+        this.aviso.set(e.status === 409
+          ? 'Este mês ainda não tem dados prontos. Aguarde a sincronização ou escolha outro mês.'
+          : mensagemDeErro(e, 'Não foi possível criar o relatório. Tente novamente.'));
+      },
     });
   }
   protected salvarRegra() {
@@ -310,9 +295,9 @@ export class Inicio {
         next: () => {
           this.editandoRegra = null;
           this.carregar();
-          this.aviso.set('Regra salva.');
+          this.sucessoAviso('Regra salva.');
         },
-        error: (e) => this.aviso.set(mensagemDeErro(e, 'Confira os valores e tente novamente.')),
+        error: (e) => this.erroAviso(mensagemDeErro(e, 'Confira os valores e tente novamente.')),
       });
   }
   protected editarRegra(r: Regra) {
@@ -328,9 +313,9 @@ export class Inicio {
       .subscribe({
         next: () => {
           this.carregar();
-          this.aviso.set('Item removido.');
+          this.sucessoAviso('Item removido.');
         },
-        error: (e) => this.aviso.set(mensagemDeErro(e, 'Não foi possível remover.')),
+        error: (e) => this.erroAviso(mensagemDeErro(e, 'Não foi possível remover.')),
       });
   }
   protected nomeLoja(id: number) {
@@ -347,10 +332,10 @@ export class Inicio {
           this.editandoExcecao = null;
           this.excecao = { estabelecimentoId: 0, motivo: '' };
           this.carregar();
-          this.aviso.set('Lista branca atualizada.');
+          this.sucessoAviso('Lista branca atualizada.');
         },
         error: (e) =>
-          this.aviso.set(mensagemDeErro(e, 'Confira os dados. A loja pode já estar na lista.')),
+          this.erroAviso(mensagemDeErro(e, 'Confira os dados. A loja pode já estar na lista.')),
       });
   }
   protected editarExcecao(item: Excecao) {
@@ -371,9 +356,9 @@ export class Inicio {
           a.download = 'neurowallet-relatorios.' + this.formato;
           a.click();
           setTimeout(() => URL.revokeObjectURL(url), 30000);
-          this.aviso.set('Arquivo gerado. Confira seus downloads.');
+          this.sucessoAviso('Arquivo gerado. Confira seus downloads.');
         },
-        error: (e) => this.aviso.set(mensagemDeErro(e, 'Não foi possível exportar o relatório.')),
+        error: (e) => this.erroAviso(mensagemDeErro(e, 'Não foi possível exportar o relatório.')),
       });
   }
   protected sair() {

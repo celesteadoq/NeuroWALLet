@@ -47,7 +47,7 @@
             <span>1</span>
             <div>
               <strong>Escolha sua instituição</strong>
-              <p>{{ demonstracao() ? 'Escolha Aurora ou Horizonte abaixo.' : 'A lista de bancos abre no Pluggy Connect.' }}</p>
+              <p>Escolha o banco que deseja conectar.</p>
             </div>
           </li>
           <li>
@@ -61,23 +61,29 @@
             <span>3</span>
             <div>
               <strong>Comece a acompanhar</strong>
-              <p>Importe o histórico depois que a conta aparecer no painel.</p>
+              <p>Seu histórico será sincronizado automaticamente após a conexão.</p>
             </div>
           </li>
         </ol>
         @if (erro()) {
           <p class="erro" role="alert">{{ erro() }}</p>
         }
-        @if (demonstracao()) {
-          <p><strong>Ambiente de demonstração</strong> — bancos e compras fictícios. A importação e a análise são processadas pelo backend e pelo Gemini.</p>
-          <button (click)="continuar('aurora')" [disabled]="enviando()">Conectar Banco Aurora</button>
-          <button (click)="continuar('horizonte')" [disabled]="enviando()">Conectar Banco Horizonte</button>
-        } @else {
-        <button (click)="continuar()" [disabled]="enviando() || !ambienteCarregado()">
-          {{ enviando() ? 'Abrindo ambiente seguro…' : 'Escolher meu banco' }} →
+        <button (click)="abrirConexao()" [disabled]="enviando() || !ambienteCarregado()">
+          {{ enviando() ? 'Abrindo ambiente seguro…' : 'Conectar banco' }} →
         </button>
+        @if (escolhendo()) {
+          <div class="bank-overlay" role="presentation" (click)="!enviando() && escolhendo.set(false)">
+            <section class="bank-dialog" role="dialog" aria-modal="true" aria-labelledby="bank-title" (click)="$event.stopPropagation()" (keydown.escape)="!enviando() && escolhendo.set(false)">
+              <button class="dialog-close" (click)="escolhendo.set(false)" [disabled]="enviando()" aria-label="Fechar seleção de bancos">✕</button>
+              <h2 id="bank-title">Escolha sua instituição</h2>
+              <p>Conecte suas contas para acompanhar tudo em um só lugar.</p>
+              <button (click)="continuar('aurora')" [disabled]="enviando()">Banco Aurora — Demonstração →</button>
+              <button (click)="continuar('horizonte')" [disabled]="enviando()">Banco Horizonte — Demonstração →</button>
+              <small>Você pode conectar mais de uma instituição.</small>
+            </section>
+          </div>
         }
-        <div class="secure">◇ {{ demonstracao() ? 'Dados fictícios enviados pela API do banco de demonstração' : 'Conexão com autorização via Pluggy' }}</div>
+        <div class="secure">◇ Conexão com sua autorização</div>
         <a routerLink="/inicio" class="skip">Prefiro explorar o painel primeiro</a>
         <footer>
           Ao continuar, confira nossos <a routerLink="/termos-de-uso">termos</a> e a

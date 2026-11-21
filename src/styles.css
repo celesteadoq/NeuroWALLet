@@ -37,3 +37,19 @@ button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
+/* Feedback e escolhas da área autenticada. */
+.app-shell .notice { background:#edf4ff; color:#234b7d; border-left:4px solid #4d83c8; }
+.app-shell .notice-success { background:#eaf7ee; color:#20643c; border-color:#38a267; }
+.app-shell .notice-error { background:#fff0f0; color:#982d35; border-color:#d45661; }
+.app-shell .notice-warning { background:#fff6df; color:#805b12; border-color:#d4a431; }
+.report-actions { display:flex; flex-wrap:wrap; gap:18px; align-items:end; margin-bottom:24px; }
+.report-actions small { flex-basis:100%; color:#66677b; }
+.bank-overlay { position:fixed; inset:0; z-index:100; background:#20202b80; backdrop-filter:blur(5px); display:grid; place-items:center; padding:24px; }
+.bank-dialog { position:relative; width:min(100%,460px); padding:36px; border-radius:24px; background:white; box-shadow:0 24px 80px #0003; animation:bank-open .2s ease-out; }
+.bank-dialog h2 { color:#343546; font-size:25px; margin:0 25px 12px 0; }
+.bank-dialog p,.bank-dialog small { color:#66677b; line-height:1.6; }
+.bank-dialog button { display:block; width:100%; margin:14px 0; border:1px solid #e8e4ec; border-radius:14px; padding:18px; background:#faf8fc; color:#343546; font:inherit; text-align:left; cursor:pointer; transition:background .18s,transform .18s; }
+.bank-dialog button:hover { background:#fff0e9; transform:translateY(-1px); }
+.bank-dialog .dialog-close { position:absolute; right:18px; top:8px; width:auto; padding:8px; border:0; background:transparent; }
+@keyframes bank-open { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@media(prefers-reduced-motion:reduce) { .bank-dialog,.bank-dialog button { animation:none; transition:none; } }

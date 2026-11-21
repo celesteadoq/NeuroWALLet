@@ -53,6 +53,11 @@ export class Banco {
   protected readonly erro = signal<string | null>(null);
   protected readonly demonstracao = signal(false);
   protected readonly ambienteCarregado = signal(false);
+  protected readonly escolhendo = signal(false);
+  protected abrirConexao(): void {
+    if (this.demonstracao()) this.escolhendo.set(true);
+    else this.continuar();
+  }
   constructor() {
     this.banco.ambiente().subscribe({
       next: (r) => { this.demonstracao.set(r.demonstracao); this.ambienteCarregado.set(true); },

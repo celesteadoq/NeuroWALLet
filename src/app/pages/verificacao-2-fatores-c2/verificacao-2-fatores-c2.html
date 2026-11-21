@@ -8,7 +8,7 @@
       <img src="/images/Logo.png" alt="Logo NeuroWALLet" />
     </div>
     <div>
-      <p class="etapa">ETAPA 1 DE 2 • CONFIGURAÇÃO</p>
+      <p class="etapa">CONFIGURAÇÃO E CONFIRMAÇÃO</p>
       <h2>Ative a autenticação em 2 etapas</h2>
       <p class="description">
         Adicione uma camada extra de proteção à sua conta com um aplicativo autenticador.
@@ -49,15 +49,21 @@
       }
       <p>Guarde esta chave em um local seguro. Não compartilhe.</p>
     </div>
-    <div class="button-login">
-      <a
-        class="butao"
-        routerLink="/verificacao-2-fatores-l"
-        [attr.aria-disabled]="!chave()"
-        (click)="!chave() && $event.preventDefault()"
-        >Continuar</a
-      >
-    </div>
+    @if (recuperacao().length) {
+      <section aria-live="polite">
+        <h2>Autenticador confirmado</h2>
+        <p>Guarde estes códigos de recuperação em um local seguro. Cada código pode ser usado uma vez.</p>
+        @for (item of recuperacao(); track item) { <p><code>{{ item }}</code></p> }
+        <div class="button-login"><button class="butao" type="button" (click)="concluir()">Guardei os códigos, continuar</button></div>
+      </section>
+    } @else {
+      <form (submit)="$event.preventDefault(); confirmar()">
+        <h3>3. Confirme o código do autenticador</h3>
+        <p>Depois de adicionar a conta ao aplicativo, digite o código de seis dígitos exibido nele.</p>
+        <app-codigo-verificacao (alterado)="codigo.set($event)" />
+        <div class="button-login"><button class="butao" type="submit" [disabled]="!chave() || codigo().length !== 6 || enviando()">{{ enviando() ? 'Confirmando…' : 'Confirmar autenticador e continuar' }}</button></div>
+      </form>
+    }
     <a class="back-link" routerLink="/login">Cancelar</a>
   </section>
 </main>
