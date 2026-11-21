@@ -59,10 +59,8 @@ npm.cmd run build
 npm.cmd test -- --watch=false
 ```
 
-O build gera dist/neuro-wallet. As páginas são renderizadas no cliente para manter os tokens no navegador. O servidor Node distribuído encaminha /api ao backend; execute npm run serve:ssr:neuro-wallet. API_TARGET define a origem da API (padrão http://127.0.0.1:8080); PORT define a porta do front (padrão 4000). Ajuste FRONTEND_ORIGIN para a origem pública do front. Use HTTPS no ambiente publicado.
+O build gera `dist/neuro-wallet`. Para verificar o build localmente com o backend rodando na porta `8080`, execute `npm.cmd run serve:ssr:neuro-wallet` e abra [localhost:4000](http://localhost:4000). Ajuste `FRONTEND_ORIGIN` no backend para `http://localhost:4000` antes de iniciar a API com essa configuração.
 
-O proxy do ng serve é usado apenas durante desenvolvimento. Se hospedar somente os arquivos estáticos, configure o servidor de hospedagem para encaminhar /api/** ao backend e retornar index.html para as rotas do Angular.
-
-O painel segue a identidade visual do Figma, com navegação superior e menu compacto no celular. Inclui resumo, faturas, alertas, conquistas, contas, criação/edição/exclusão de gatilhos e lista branca, sumários e exportação de relatórios em CSV/PDF. As informações que a API não fornece não são simuladas. As animações respeitam a preferência de movimento reduzido. Termos de uso e política de privacidade possuem páginas próprias com texto de exemplo para revisão da equipe; responsável pelos dados, canal de contato e retenção ainda devem ser definidos antes da disponibilização pública.
+O painel segue a identidade visual do Figma, com navegação superior e menu compacto no celular. Inclui resumo, faturas, alertas, conquistas, contas, criação/edição/exclusão de gatilhos e lista branca, sumários e exportação de relatórios em CSV/PDF. As informações que a API não fornece não são simuladas. As animações respeitam a preferência de movimento reduzido. Termos de uso e política de privacidade possuem páginas próprias com texto de exemplo para revisão da equipe.
 
 A autenticação permite nova tentativa após erro, informa limites de requisições e possui tempo limite de rede. Os testes cobrem código incorreto, excesso de tentativas, sessão expirada e prevenção de envios duplicados.
