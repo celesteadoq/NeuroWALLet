@@ -5,12 +5,16 @@ import { API } from '../core/config';
 export interface Conta {
   id: number;
   instituicao: string;
+  ativa?: boolean;
 }
 @Injectable({ providedIn: 'root' })
 export class BancoService {
   private readonly http = inject(HttpClient);
-  listar() {
-    return this.http.get<Conta[]>(API.baseUrl + '/contas').pipe(timeout(20000));
+  listar(incluirDesconectadas = false) {
+    return this.http.get<Conta[]>(API.baseUrl + '/contas' + (incluirDesconectadas ? '?incluirDesconectadas=true' : '')).pipe(timeout(20000));
+  }
+  remover(id: number, apagarHistorico: boolean) {
+    return this.http.delete<void>(API.baseUrl + '/contas/' + id + '?apagarHistorico=' + apagarHistorico).pipe(timeout(60000));
   }
   ambiente() {
     return this.http.get<{ demonstracao: boolean; pluggyConfigurado: boolean }>(API.baseUrl + '/openfinance/ambiente').pipe(timeout(10000));

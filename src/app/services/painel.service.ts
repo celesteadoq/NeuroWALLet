@@ -30,6 +30,11 @@ export interface Alerta {
   mensagem: string;
   projecao: number;
   criadoEm: string;
+  estabelecimento: string;
+  compras: number;
+  observado: number;
+  inicio: string;
+  fim: string;
 }
 export interface Fatura {
   mesReferencia: string;

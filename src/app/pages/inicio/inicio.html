@@ -127,7 +127,7 @@
             </section>
             <section class="card">
               <h2>Suas conexões</h2>
-              @for (conta of contas(); track conta.id) {
+              @for (conta of contasAtivas(); track conta.id) {
                 <div class="list-row">
                   <span>▣ {{ conta.instituicao }}</span><small>Sincronização automática</small>
                 </div>
@@ -169,28 +169,40 @@
         </section>
       }
       @case ('alertas') {
-        <button class="link-button section-link" (click)="navegar('gatilhos')">
-          Configurar gatilhos
-        </button>
+        <section class="alert-overview">
+          <div class="alert-overview-icon" aria-hidden="true">↗</div>
+          <div><span class="accent">UM OLHAR PARA SEUS HÁBITOS</span><h2>Pequenas compras, uma visão maior.</h2><p>Encontre padrões no seu dia a dia e escolha os limites que fazem sentido para você.</p></div>
+          <button class="secondary" (click)="navegar('gatilhos')">Ajustar meus alertas</button>
+        </section>
+        <div class="alert-controls">
+          <label>Buscar estabelecimento<input type="search" placeholder="Ex.: Shopee" [ngModel]="buscaAlerta()" (ngModelChange)="buscaAlerta.set($event); limiteAlertas.set(8)" /></label>
+          <label>Período<select [ngModel]="filtroAlertas()" (ngModelChange)="filtroAlertas.set($event); limiteAlertas.set(8)"><option value="todos">Todos os alertas</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></label>
+          <p aria-live="polite"><strong>{{ alertasFiltrados().length }}</strong> alertas em <strong>{{ lojasEmAlerta() }}</strong> estabelecimentos</p>
+        </div>
         @if (erros()['alertas']) {
           <p class="error">{{ erros()['alertas'] }}</p>
         }
-        <div class="dashboard-grid">
-          @for (item of alertas(); track item.id) {
-            <article class="card">
-              <h2>Padrão de consumo identificado</h2>
-              <span class="warning-icon">⚠</span>
-              <p class="lead">{{ item.mensagem }}</p>
-              <p>Projeção até o fim do mês: {{ item.projecao | currency: 'BRL' }}</p>
-              <small>{{ item.criadoEm | date: 'dd/MM/yyyy' }}</small>
+        <div class="alert-feed">
+          @for (item of alertasFiltrados().slice(0, limiteAlertas()); track item.id) {
+            <article class="alert-entry">
+              <span class="alert-entry-icon" aria-hidden="true">↗</span>
+              <div class="alert-entry-content">
+                <div class="alert-entry-heading"><h2>{{ item.estabelecimento }}</h2><span class="alert-pill">Compras recorrentes</span></div>
+                <p class="alert-period">{{ item.compras }} compras · {{ item.inicio | date:'dd/MM/yyyy' }} a {{ item.fim | date:'dd/MM/yyyy' }}</p>
+                <div class="alert-values"><div><small>Total observado</small><strong>{{ item.observado | currency:'BRL' }}</strong></div><div><small>Projeção mensal nesse ritmo</small><strong>{{ item.projecao | currency:'BRL' }}</strong></div></div>
+                <details class="alert-explanation"><summary>Entender este alerta</summary><p>{{ item.mensagem }}</p><small>A projeção é uma estimativa baseada no período observado.</small></details>
+                <footer><span>Identificado em {{ item.criadoEm | date:'dd/MM/yyyy' }}</span><button class="link-button" (click)="navegar('gatilhos')">Revisar meus limites →</button></footer>
+              </div>
             </article>
           } @empty {
             <section class="card empty">
-              <h2>Nenhum alerta por aqui</h2>
-              <p>Os padrões identificados nas transações analisadas aparecerão nesta área.</p>
+              <span class="alert-calm" aria-hidden="true">✓</span>
+              <h2>{{ alertas().length ? 'Nenhum resultado para essa busca' : 'Tudo tranquilo por aqui' }}</h2>
+              <p>{{ alertas().length ? 'Experimente outro estabelecimento ou período.' : 'Quando suas compras formarem um padrão, você encontrará os detalhes aqui.' }}</p>
             </section>
           }
         </div>
+        @if (alertasFiltrados().length > limiteAlertas()) { <button class="secondary alert-more" (click)="limiteAlertas.set(limiteAlertas() + 8)">Ver mais alertas</button> }
       }
       @case ('faturas') {
         <div class="dashboard-grid">
@@ -536,7 +548,8 @@
           }
           @for (conta of contas(); track conta.id) {
             <div class="list-row">
-              <strong>▣ {{ conta.instituicao }}</strong><span>Sincronização automática ativa</span>
+              <div><strong>▣ {{ conta.instituicao }}</strong><small>{{ conta.ativa === false ? 'Desconectada · histórico preservado' : 'Sincronização automática ativa' }}</small></div>
+              <button class="link-button danger-link" (click)="abrirRemocao(conta)">{{ conta.ativa === false ? 'Apagar histórico' : 'Remover conexão' }}</button>
             </div>
           } @empty {
             <p class="empty">
@@ -579,3 +592,16 @@
     </footer>
   </main>
 </div>
+@if (contaRemover(); as conta) {
+  <div class="bank-overlay" role="presentation" (click)="!removendoBanco() && contaRemover.set(null)">
+    <section class="bank-dialog remove-bank-dialog" role="dialog" aria-modal="true" aria-labelledby="remove-bank-title" (click)="$event.stopPropagation()" (keydown.escape)="!removendoBanco() && contaRemover.set(null)">
+      <button class="dialog-close" (click)="contaRemover.set(null)" [disabled]="removendoBanco()" aria-label="Fechar confirmação">✕</button>
+      <h2 id="remove-bank-title">Remover {{ conta.instituicao }}?</h2>
+      <p>Escolha como deseja encerrar esta conexão no NeuroWALLet.</p>
+      @if (conta.ativa !== false) { <label class="removal-choice"><input type="radio" name="remocao" [value]="false" [(ngModel)]="apagarHistoricoBanco" [disabled]="removendoBanco()" /><span><strong>Desconectar e manter histórico</strong><small>Para a sincronização neste app. As compras e os relatórios permanecem disponíveis.</small></span></label> }
+      <label class="removal-choice"><input type="radio" name="remocao" [value]="true" [(ngModel)]="apagarHistoricoBanco" [disabled]="removendoBanco()" /><span><strong>Remover também o histórico</strong><small>Apaga as transações deste banco. As análises serão recalculadas; os relatórios precisarão ser gerados novamente. Essa exclusão não pode ser desfeita.</small></span></label>
+      @if (erroRemocao()) { <p class="error" role="alert">{{ erroRemocao() }}</p> }
+      <div class="remove-bank-actions"><button (click)="contaRemover.set(null)" [disabled]="removendoBanco()">Cancelar</button><button class="confirm-remove" (click)="confirmarRemocao()" [disabled]="removendoBanco()">{{ removendoBanco() ? 'Removendo…' : apagarHistoricoBanco ? 'Apagar banco e histórico' : 'Desconectar banco' }}</button></div>
+    </section>
+  </div>
+}

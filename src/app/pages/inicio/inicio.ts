@@ -1,4 +1,4 @@
-import { Component, afterNextRender, inject, signal, DestroyRef } from '@angular/core';
+import { Component, afterNextRender, computed, inject, signal, DestroyRef } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -47,6 +47,41 @@ export class Inicio {
   protected readonly contas = signal<Conta[]>([]);
   protected readonly gastos = signal<Pagina | null>(null);
   protected readonly alertas = signal<Alerta[]>([]);
+  protected readonly filtroAlertas = signal('todos');
+  protected readonly buscaAlerta = signal('');
+  protected readonly limiteAlertas = signal(8);
+  protected readonly alertasFiltrados = computed(() => {
+    const busca = this.buscaAlerta().trim().toLocaleLowerCase('pt-BR');
+    const dias = this.filtroAlertas() === 'todos' ? null : Number(this.filtroAlertas());
+    return this.alertas().filter(a => (!busca || (a.estabelecimento + ' ' + a.mensagem).toLocaleLowerCase('pt-BR').includes(busca))
+      && (dias === null || Date.parse(a.criadoEm) >= Date.now() - dias * 86400000));
+  });
+  protected readonly lojasEmAlerta = computed(() => new Set(this.alertasFiltrados().map(a => a.estabelecimento)).size);
+  protected readonly contaRemover = signal<Conta | null>(null);
+  protected apagarHistoricoBanco = false;
+  protected readonly removendoBanco = signal(false);
+  protected readonly erroRemocao = signal('');
+  protected contasAtivas() { return this.contas().filter(c => c.ativa !== false); }
+  protected abrirRemocao(conta: Conta) {
+    this.contaRemover.set(conta); this.apagarHistoricoBanco = conta.ativa === false; this.erroRemocao.set('');
+  }
+  protected confirmarRemocao() {
+    const conta = this.contaRemover();
+    if (!conta || this.removendoBanco()) return;
+    this.removendoBanco.set(true); this.erroRemocao.set('');
+    this.banco.remover(conta.id, this.apagarHistoricoBanco).pipe(finalize(() => this.removendoBanco.set(false))).subscribe({
+      next: () => {
+        this.contas.update(contas => this.apagarHistoricoBanco
+          ? contas.filter(c => c.id !== conta.id)
+          : contas.map(c => c.id === conta.id ? {...c,ativa:false} : c));
+        this.contaRemover.set(null); this.carregar();
+        this.sucessoAviso(this.apagarHistoricoBanco ? 'Banco e histórico removidos. As análises serão recalculadas com os dados restantes.' : 'Banco desconectado. Seu histórico foi preservado.');
+      },
+      error: e => this.erroRemocao.set(e.status === 409
+        ? 'Há uma sincronização em andamento. Aguarde alguns instantes e tente novamente.'
+        : mensagemDeErro(e, 'Não foi possível remover esta conexão. Tente novamente.')),
+    });
+  }
   protected readonly faturas = signal<Fatura[]>([]);
   protected readonly selos = signal<Selo[]>([]);
   protected readonly dias = signal<string[]>([]);
@@ -239,7 +274,7 @@ export class Inicio {
         obs: this.api.get<Excecao[]>('/lista-branca'),
         set: (r: Excecao[]) => this.excecoes.set(r),
       },
-      { id: 'contas', obs: this.banco.listar(), set: (r: Conta[]) => this.contas.set(r) },
+      { id: 'contas', obs: this.banco.listar(true), set: (r: Conta[]) => this.contas.set(r) },
     ];
     let restantes = tarefas.length;
     for (const t of tarefas) {
