@@ -1,15 +1,45 @@
 # NeuroWALLet — Frontend
 
-Frontend Angular conectado à NeuroWALLet API Java. Requer Node 24.15 ou superior compatível com Angular 22 e npm.
+Frontend Angular 22 conectado à NeuroWALLet API Java.
 
-## Executar localmente
+## Preparar o projeto
 
-1. No backend, configure o arquivo local .env e execute PostgreSQL, RabbitMQ e Mailpit com docker compose up -d --wait.
-2. Inicie a API Java na porta 8080, conforme o README do backend.
-3. Neste repositório, execute npm ci e npm start.
-4. Abra http://localhost:3000.
+Se ainda não baixou os repositórios, execute:
 
-O proxy.conf.json encaminha /api/** para http://localhost:8080. O backend deve usar FRONTEND_ORIGIN=http://localhost:3000. Alterações nessa variável exigem reiniciar a API.
+```powershell
+git clone https://github.com/MarcoAn778/NeuroWALLet_back_end.git neurowallet-api
+cd neurowallet-api
+git clone https://github.com/celesteadoq/NeuroWALLet.git frontend
+```
+
+Coloque o **`.env` enviado pela equipe em `neurowallet-api/.env`**, ao lado do `pom.xml`. As credenciais da API e dos provedores ficam no backend. O frontend usa as rotas `/api` no mesmo endereço do portal.
+
+## Executar com Docker
+
+Abra o Docker Desktop e execute na raiz do **backend**, onde está o `iniciar.ps1`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\iniciar.ps1 -Demonstracao
+```
+
+O comando monta o frontend e inicia a API, os serviços e os bancos fictícios Aurora e Horizonte. Abra [o portal](http://localhost:3000) quando o script terminar. Para usar a Pluggy, execute o mesmo comando sem `-Demonstracao` e configure o webhook HTTPS conforme o [README do backend](https://github.com/MarcoAn778/NeuroWALLet_back_end#consentimento-open-finance).
+
+Para parar o modo demonstração, execute `powershell -ExecutionPolicy Bypass -File .\parar.ps1 -Demonstracao` na raiz do backend. Para o modo normal, execute sem `-Demonstracao`.
+
+## Executar sem Docker
+
+1. Instale o Node.js **24.15 ou posterior da linha 24**, com npm. Confira com `node --version` e `npm.cmd --version`.
+2. Siga o [guia do backend sem Docker](https://github.com/MarcoAn778/NeuroWALLet_back_end#executar-sem-docker) para iniciar PostgreSQL, RabbitMQ, Mailpit e a API Java. Confirme que [a API local](http://localhost:8080/actuator/health) responde antes de iniciar o frontend.
+3. Em outro terminal, na pasta `frontend`, execute:
+
+   ```powershell
+   npm.cmd ci
+   npm.cmd start
+   ```
+
+4. Abra [o portal](http://localhost:3000). Para parar o Angular, pressione `Ctrl+C` no terminal.
+
+No Linux e macOS, use `npm` no lugar de `npm.cmd`. O arquivo `proxy.conf.json` encaminha `/api/**` e `/actuator/**` para `http://localhost:8080`. Se o portal abrir, mas o cadastro ou login falhar, confira [a saúde pelo proxy](http://localhost:3000/actuator/health) e confirme que o backend usa `FRONTEND_ORIGIN=http://localhost:3000`.
 
 ## Fluxos integrados
 
@@ -18,14 +48,16 @@ O proxy.conf.json encaminha /api/** para http://localhost:8080. O backend deve u
 - Sessão Bearer JWT: sessionStorage sem a opção Manter conectado; localStorage com a opção marcada. O token temporário de 2FA permanece apenas na aba. Renovação de acesso e logout com limpeza dos tokens dos dois armazenamentos.
 - Recuperação de senha por e-mail; o link chega ao Mailpit local em http://localhost:8025. O front recebe /redefinir-senha#token=... e remove o token da URL após a leitura.
 - Conexão via Pluggy Connect com token emitido pela API. Credenciais Pluggy e webhook HTTPS ficam no backend. A seleção da instituição acontece no widget. A tela aguarda o webhook e permite consultar novamente.
-- Lista de contas, importação manual, resumo mensal, alertas, projeção de faturas, selos e relatórios com dados reais ou estado vazio.
+- Lista de contas, importação manual, resumo mensal, alertas, projeção de faturas, selos e relatórios com dados da API ou estado vazio. O sumário narrativo fica disponível automaticamente após o fechamento do mês e a análise das transações.
 
-A classificação e os relatórios gerados por IA dependem da chave Anthropic no backend. A conexão bancária real depende da configuração Pluggy. Nenhuma chave secreta de provedor deve ser colocada no frontend.
+A classificação e os textos gerados por IA usam o provedor configurado no backend, Gemini ou Anthropic. A conexão bancária real depende da configuração da Pluggy. Com o Mailpit configurado, acompanhe os e-mails locais na [caixa de teste](http://localhost:8025).
 
 ## Build e testes
 
-npm run build
-npm test -- --watch=false
+```powershell
+npm.cmd run build
+npm.cmd test -- --watch=false
+```
 
 O build gera dist/neuro-wallet. As páginas são renderizadas no cliente para manter os tokens no navegador. O servidor Node distribuído encaminha /api ao backend; execute npm run serve:ssr:neuro-wallet. API_TARGET define a origem da API (padrão http://127.0.0.1:8080); PORT define a porta do front (padrão 4000). Ajuste FRONTEND_ORIGIN para a origem pública do front. Use HTTPS no ambiente publicado.
 
