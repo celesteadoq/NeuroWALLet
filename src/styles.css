@@ -93,4 +93,24 @@ button:disabled {
 .remove-bank-actions button { flex:1; text-align:center; font-weight:600; }
 .remove-bank-actions .confirm-remove { background:#b43e4a; color:white; border-color:#b43e4a; }
 .remove-bank-actions .confirm-remove:hover { background:#9f303e; }
+
+.invoice-picker { max-width: 320px; }
+.invoice-brand { display: block; margin: 20px 0 12px; font-size: 32px; }
+.invoice-number { font-size: 21px; letter-spacing: .08em; }
+.invoice-month { text-transform: capitalize; }
+.bank-cards { margin-bottom: 24px; }
+.bank-card-icon { display: block; margin: 12px 0; font-size: 25px; }
+.bank-sync-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+.sync-origin { color: #25604c; background: #e5f5ee; border-radius: 20px; padding: 4px 10px; font-size: 12px; }
+.bank-cards .primary { width: 100%; margin-bottom: 12px; }
+.bank-cards .danger-link { display: block; margin-top: 10px; }
+.bank-add { width: min(100%, 320px); }
+.admin-log { margin-top: 24px; }
+.admin-log .admin-log-row { justify-content: flex-start; gap: 24px; }
+.admin-log-row time { flex-shrink: 0; color: #5e6073; }
+.admin-log-row.integration-error { background: #fff0ed; }
+.app-shell .header-actions > button.admin-exit { display: inline-flex; }
+@media (max-width: 620px) {
+  .admin-log .admin-log-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
 @media(max-width:700px) { .alert-overview { flex-wrap:wrap; padding:22px; gap:16px; } .alert-overview .secondary { margin-left:0; width:100%; } .alert-overview h2 { font-size:21px; } .alert-entry { padding:20px 16px; gap:12px; } .alert-entry-icon { display:none; } .alert-values { gap:16px 28px; } .alert-values strong { font-size:21px; } .remove-bank-dialog { padding:26px 20px; } .remove-bank-actions { flex-direction:column; gap:0; } }

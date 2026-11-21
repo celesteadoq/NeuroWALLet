@@ -2,6 +2,11 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
+  {
+    path: 'admin/login',
+    data: { administrativo: true },
+    loadComponent: () => import('./pages/login/login').then((m) => m.Login),
+  },
   // ---------- entrada e cadastro (sem sessão) ----------
   {
     path: 'login',

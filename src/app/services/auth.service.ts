@@ -25,6 +25,7 @@ export class AuthService {
       .post<{ tokenPre2fa: string; configurarTotp: boolean }>(this.base + '/login', {
         email: pedido.email,
         senha: pedido.senha,
+        ...(pedido.administrativo ? { administrativo: true } : {}),
       })
       .pipe(
         timeout(20000),

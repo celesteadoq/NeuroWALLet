@@ -4,8 +4,9 @@
       ><img src="/images/Logo.png" alt="" />NeuroWALLet</a
     >
     <div class="header-actions">
-      <button (click)="sair()">↪ Sair</button
-      ><button
+      <button (click)="sair()" [class.admin-exit]="admin()">↪ Sair</button>
+      @if (!admin()) {
+      <button
         class="menu-toggle"
         (click)="menuAberto.set(!menuAberto())"
         [attr.aria-expanded]="menuAberto()"
@@ -13,6 +14,7 @@
       >
         {{ menuAberto() ? 'Fechar ✕' : 'Menu ☰' }}
       </button>
+      }
     </div>
   </header>
   @if (!admin()) {
@@ -49,6 +51,10 @@
                         ? 'Escolha quais estabelecimentos devem ficar fora da análise.'
                         : aba() === 'sumario'
                           ? 'Uma leitura dos seus hábitos para apoiar suas próximas decisões.'
+                          : aba() === 'contas'
+                            ? 'Suas conexões com o Open Finance, em um só lugar.'
+                            : aba() === 'saude'
+                              ? 'Visão operacional · SysAdmin'
                           : aba() === 'exportar'
                             ? 'Escolha o formato que funciona melhor para você.'
                             : 'Ajuste sua experiência e acompanhe suas informações.'
@@ -208,11 +214,27 @@
         <div class="dashboard-grid">
           <div class="column">
             <section class="card">
-              <h2>Suas contas</h2>
-              @for (conta of contas(); track conta.id) {
-                <p class="lead">▣ {{ conta.instituicao }}</p>
-              } @empty {
-                <p>Conecte uma conta para começar.</p>
+              <h2>Seu cartão</h2>
+              @if (cartao(); as selecionado) {
+                @if (cartoes().length > 1) {
+                  <label class="invoice-picker">Cartão
+                    <select [ngModel]="selecionado.id" (ngModelChange)="cartaoSelecionado.set($event)">
+                      @for (opcao of cartoes(); track opcao.id) {
+                        <option [ngValue]="opcao.id">{{ opcao.instituicao }}{{ opcao.finalConta ? ' · ' + opcao.finalConta : '' }}</option>
+                      }
+                    </select>
+                  </label>
+                }
+                <strong class="invoice-brand">{{ selecionado.bandeira || selecionado.instituicao }}</strong>
+                @if (selecionado.finalConta) {
+                  <p class="invoice-number">•••• •••• •••• {{ selecionado.finalConta }}</p>
+                }
+                @if (selecionado.diaFechamento) {
+                  <p class="lead">Fecha dia {{ selecionado.diaFechamento }}</p>
+                }
+                @if (selecionado.titular) { <p>{{ selecionado.titular }}</p> }
+              } @else {
+                <p>Nenhum cartão disponível.</p>
                 <a routerLink="/banco">Conectar banco →</a>
               }
             </section>
@@ -229,12 +251,11 @@
             @if (erros()['faturas']) {
               <p class="error">{{ erros()['faturas'] }}</p>
             }
-            @for (mes of faturas(); track mes.mesReferencia) {
+            @for (mes of proximasFaturas(); track mes.mesReferencia) {
               <div class="soft-row">
                 <div>
-                  <strong>{{ mes.mesReferencia + '-01' | date: 'MMMM yyyy' }}</strong><small
-                    >Parcelas projetadas do histórico analisado</small
-                  >
+                  <strong class="invoice-month">{{ mes.mesReferencia + '-01' | date: "MMMM 'de' yyyy" }}</strong>
+                  <small>{{ mes.parcelas }} {{ mes.parcelas === 1 ? 'parcela' : 'parcelas' }} de microtransações</small>
                 </div>
                 <strong>{{ mes.valorProjetado | currency: 'BRL' }}</strong>
               </div>
@@ -270,8 +291,10 @@
               <section class="card">
                 <h2>{{ selo.nome }}</h2>
                 <span class="badge-icon">♧</span>
-                <p>{{ selo.criterioDias }} dias sem compras fast-fashion.</p>
-                <small>Conquistado em {{ selo.concedidoEm | date: 'dd/MM/yyyy' }}</small>
+                <p>{{ selo.descricao }}</p>
+                @if (selo.concedidoEm) {
+                  <small>Conquistado em {{ selo.concedidoEm | date: 'dd/MM/yyyy' }}</small>
+                }
               </section>
             } @empty {
               <section class="card">
@@ -385,84 +408,45 @@
       @case ('lista') {
         <div class="dashboard-grid">
           <section class="card">
-            <h2>{{ editandoExcecao ? 'Editar exceção' : 'Adicionar estabelecimento' }}</h2>
-            <form
-              #listaForm="ngForm"
-              (ngSubmit)="listaForm.valid && excecao.estabelecimentoId > 0 && salvarExcecao()"
-            >
-              <label
-                >Estabelecimento<select
-                  name="loja"
-                  [(ngModel)]="excecao.estabelecimentoId"
-                  required
-                >
-                  <option [ngValue]="0" disabled>Selecione um estabelecimento</option>
-                  @for (loja of lojas(); track loja.id) {
-                    <option [ngValue]="loja.id">{{ loja.nome }}</option>
-                  }
-                </select></label
-              ><label
-                >Motivo<input
-                  name="motivo"
-                  [(ngModel)]="excecao.motivo"
-                  required
-                  maxlength="255"
-                  placeholder="Ex.: despesa recorrente" /></label
-              ><button
-                class="primary"
-                [disabled]="ocupado() || listaForm.invalid || excecao.estabelecimentoId === 0"
-              >
-                Salvar exceção
+            <h2>{{ editandoExcecao ? 'Editar exceção' : 'Adicionar despesa recorrente' }}</h2>
+            <form (ngSubmit)="salvarExcecao()">
+              <label>Estabelecimento ou assinatura
+                <input name="loja" [(ngModel)]="excecao.nome" maxlength="150" required
+                  list="estabelecimentos" placeholder="Ex.: Netflix" />
+                <datalist id="estabelecimentos">
+                  @for (loja of lojas(); track loja.id) { <option [value]="loja.nome"></option> }
+                </datalist>
+              </label>
+              <button class="primary" [disabled]="ocupado() || !excecao.nome.trim()">
+                {{ editandoExcecao ? 'Salvar alteração' : 'Adicionar à lista branca' }}
               </button>
               @if (editandoExcecao) {
-                <button type="button" class="link-button" (click)="editandoExcecao = null">
-                  Cancelar edição
-                </button>
+                <button type="button" class="link-button" (click)="cancelarExcecao()">Cancelar edição</button>
               }
             </form>
-            @if (!lojas().length) {
-              <p class="empty">
-                Os estabelecimentos ficam disponíveis após a importação e a classificação do
-                histórico.
-              </p>
-            }
           </section>
-          <section class="card">
-            <h2>Minha lista branca</h2>
-            @if (erros()['lista']) {
-              <p class="error">{{ erros()['lista'] }}</p>
-            }
+          <div class="column">
+            @if (erros()['lista']) { <p class="error">{{ erros()['lista'] }}</p> }
             @for (item of excecoes(); track item.id) {
-              <article class="rule">
-                <h3>{{ nomeLoja(item.estabelecimentoId) }}</h3>
-                <p>{{ item.motivo }}</p>
+              <article class="card">
+                <h2>{{ item.nome }}</h2>
+                @if (item.motivo) { <p>{{ item.motivo }}</p> }
                 <div class="row-actions">
-                  <button class="link-button" (click)="editarExcecao(item)">Editar</button
-                  ><button
-                    class="link-button"
-                    [disabled]="ocupado()"
-                    (click)="excluir('/lista-branca', item.id)"
-                  >
-                    Remover
-                  </button>
+                  <button class="link-button" (click)="editarExcecao(item)">Editar</button>
+                  <button class="link-button" [disabled]="ocupado()" (click)="excluir('/lista-branca', item.id)">Remover</button>
                 </div>
               </article>
             } @empty {
-              <p class="empty">Nenhum estabelecimento nas exceções.</p>
+              <section class="card"><p>Nenhum estabelecimento na lista branca.</p></section>
             }
-          </section>
+          </div>
         </div>
       }
       @case ('sumario') {
-        <section class="card report-actions">
-          <label>Mês do relatório<input type="month" [(ngModel)]="mesGeracao" [max]="mesAtual" /></label>
-          <button class="primary" (click)="gerarRelatorio()" [disabled]="ocupado() || !mesGeracao">{{ ocupado() ? 'Gerando relatório…' : 'Criar relatório' }}</button>
-          <small>Escolha um mês com histórico sincronizado para gerar sua leitura financeira.</small>
-        </section>
         <label class="month-picker"
           >Mês do relatório<select [(ngModel)]="mesRelatorio">
             @for (r of relatorios(); track r.mes) {
-              <option [value]="r.mes">{{ r.mes }}</option>
+              <option [value]="r.mes">{{ r.mes + '-01' | date:"MMMM 'de' yyyy" }}</option>
             }
           </select></label
         >
@@ -470,7 +454,6 @@
           <div class="dashboard-grid">
             <section class="card">
               <h2>Um mês de pequenas escolhas</h2>
-              <span class="accent">Texto gerado por IA</span>
               <p class="report-text">{{ r.texto }}</p>
             </section>
             <div class="column">
@@ -491,8 +474,7 @@
           <section class="card empty">
             <h2>Seu relatório ainda está sendo construído</h2>
             <p>
-              Os sumários mensais dependem de histórico analisado e da integração com IA
-              configurada.
+              Os relatórios são gerados automaticamente para meses encerrados após a análise das transações.
             </p>
           </section>
         }
@@ -538,44 +520,83 @@
         </div>
       }
       @case ('contas') {
-        <section class="card">
-          <div class="section-heading">
-            <h2>Minhas conexões</h2>
-            <a routerLink="/banco" class="primary">＋ Conectar conta</a>
-          </div>
-          @if (erros()['contas']) {
-            <p class="error">{{ erros()['contas'] }}</p>
-          }
+        @if (erros()['contas']) { <p class="error">{{ erros()['contas'] }}</p> }
+        <div class="dashboard-grid bank-cards">
           @for (conta of contas(); track conta.id) {
-            <div class="list-row">
-              <div><strong>▣ {{ conta.instituicao }}</strong><small>{{ conta.ativa === false ? 'Desconectada · histórico preservado' : 'Sincronização automática ativa' }}</small></div>
-              <button class="link-button danger-link" (click)="abrirRemocao(conta)">{{ conta.ativa === false ? 'Apagar histórico' : 'Remover conexão' }}</button>
-            </div>
+            <section class="card">
+              <h2>{{ conta.instituicao }}</h2>
+              <span class="bank-card-icon" aria-hidden="true">▣</span>
+              <p>{{ tipoConta(conta) }}{{ conta.finalConta ? ' · •••• ' + conta.finalConta : '' }}</p>
+              @if (conta.ativa !== false) {
+                <p class="lead">Sincronizações hoje: {{ conta.sincronizacoesHoje }} de {{ conta.limiteDiario }}</p>
+                <p>Janela de importação: últimos 90 dias</p>
+                <div class="bank-sync-meta" aria-live="polite">
+                  @if (conta.ultimaSincronizacao) {
+                    <small>Última sincronização: {{ conta.ultimaSincronizacao | date:"dd/MM/yyyy 'às' HH:mm" }}</small>
+                    @if (conta.sincronizacaoAutomatica) {
+                      <span class="sync-origin">Sincronização automática</span>
+                    } @else {
+                      <small>Sincronização manual</small>
+                    }
+                  } @else {
+                    <small>Aguardando sincronização confirmada.</small>
+                  }
+                </div>
+                <button class="primary" [disabled]="!conta.podeSincronizar || sincronizando().includes(conta.id)"
+                  (click)="sincronizar(conta)">
+                  {{ sincronizando().includes(conta.id) ? 'Sincronizando…' : 'Sincronizar agora' }}
+                </button>
+                @if (retornoSync()[conta.id]; as retorno) {
+                  <small role="status" [class.error]="retorno.erro">{{ retorno.texto }}</small>
+                }
+              } @else {
+                <p>Desconectada · histórico preservado</p>
+              }
+              <button class="link-button danger-link" (click)="abrirRemocao(conta)">
+                {{ conta.ativa === false ? 'Apagar histórico' : 'Remover conexão' }}
+              </button>
+            </section>
           } @empty {
-            <p class="empty">
-              Nenhuma conta conectada. Escolha sua instituição para começar a acompanhar suas
-              informações.
-            </p>
+            <section class="card"><p>Nenhuma conta conectada.</p></section>
           }
-        </section>
+        </div>
+        <a routerLink="/banco" class="secondary bank-add">{{ contasAtivas().length ? 'Conectar outra conta' : 'Conectar conta' }}</a>
       }
       @case ('saude') {
-        <div class="dashboard-grid">
+        <div class="dashboard-grid admin-health">
           <section class="card">
             <h2>Endpoints REST</h2>
             <strong class="amount">{{ saude() }}</strong>
-            <p>Verificação da API e dos componentes informados pelo servidor.</p>
-            <button class="secondary" (click)="consultarSaude()">Atualizar</button>
+            <p>Resposta da API de autenticação, contas e relatórios.</p>
           </section>
           <section class="card">
-            <h2>Integrações externas</h2>
-            <p class="lead">Status não informado</p>
-            <p>
-              A disponibilidade da API não confirma a conexão real com os provedores de Open Finance
-              e IA.
-            </p>
+            <h2>Conexão com o Open Finance</h2>
+            @for (provedor of saudeAdmin()?.provedores ?? []; track provedor.nome) {
+              <div class="soft-row">
+                <strong>{{ provedor.nome }}</strong><span>{{ provedor.estado }}</span>
+              </div>
+            } @empty {
+              <p>{{ erroSaude() ? 'Falha na consulta.' : 'Consultando os provedores…' }}</p>
+            }
           </section>
         </div>
+        <section class="card admin-log">
+          <div class="section-heading">
+            <h2>Integração com a IA</h2>
+            <button class="secondary" (click)="consultarSaude()" [disabled]="consultandoSaude()">Atualizar</button>
+          </div>
+          @if (saudeAdmin(); as dados) {
+            <p>Registros recentes · consulta de {{ dados.consultadoEm | date:"dd/MM/yyyy 'às' HH:mm" }}</p>
+            @for (registro of dados.registrosIa; track $index) {
+              <div class="soft-row admin-log-row" [class.integration-error]="!registro.sucesso">
+                <time [attr.datetime]="registro.momento">{{ registro.momento | date:'dd/MM/yyyy · HH:mm' }}</time>
+                <span>{{ registro.mensagem }}</span>
+              </div>
+            } @empty {
+              <p>Nenhuma atividade de IA registrada desde o início do serviço.</p>
+            }
+          }
+        </section>
       }
     }
     <footer class="page-footer">

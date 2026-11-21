@@ -11,6 +11,7 @@ import {
   Pagina,
   Alerta,
   Fatura,
+  SaudeAdministrativa,
   Selo,
   Relatorio,
   Regra,
@@ -37,14 +38,17 @@ export class Inicio {
   protected readonly tipoAviso = signal<'info' | 'sucesso' | 'erro' | 'alerta'>('info');
   protected readonly mensal = signal<{saidas: number; transacoes: number} | null>(null);
   private atualizando = false;
-  protected readonly mesAtual = new Intl.DateTimeFormat('en-CA', {timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit'}).format(new Date());
-  protected mesGeracao = this.mesAtual;
   protected readonly ocupado = signal(false);
   protected readonly carregando = signal(false);
   protected readonly erros = signal<Record<string, string>>({});
   protected readonly admin = signal(false);
   protected readonly saude = signal('Aguardando consulta');
+  protected readonly saudeAdmin = signal<SaudeAdministrativa | null>(null);
+  protected readonly erroSaude = signal(false);
+  protected readonly consultandoSaude = signal(false);
   protected readonly contas = signal<Conta[]>([]);
+  protected readonly sincronizando = signal<number[]>([]);
+  protected readonly retornoSync = signal<Record<number, { texto: string; erro: boolean }>>({});
   protected readonly gastos = signal<Pagina | null>(null);
   protected readonly alertas = signal<Alerta[]>([]);
   protected readonly filtroAlertas = signal('todos');
@@ -83,6 +87,22 @@ export class Inicio {
     });
   }
   protected readonly faturas = signal<Fatura[]>([]);
+  protected readonly cartoes = computed(() => {
+    const comParcelas = new Set(this.faturas().flatMap(mes => mes.porConta.map(conta => conta.contaId)));
+    return this.contas().filter(conta => conta.tipo === 'CREDIT' || comParcelas.has(conta.id));
+  });
+  protected readonly cartaoSelecionado = signal<number | null>(null);
+  protected readonly cartao = computed(() =>
+    this.cartoes().find(conta => conta.id === this.cartaoSelecionado()) ?? this.cartoes()[0]
+  );
+  protected readonly proximasFaturas = computed(() => {
+    const cartao = this.cartao();
+    if (!cartao) return [];
+    return this.faturas().flatMap(mes => {
+      const parcelas = mes.porConta.find(conta => conta.contaId === cartao.id);
+      return parcelas ? [{ ...parcelas, mesReferencia: mes.mesReferencia }] : [];
+    });
+  });
   protected readonly selos = signal<Selo[]>([]);
   protected readonly dias = signal<string[]>([]);
   protected readonly relatorios = signal<Relatorio[]>([]);
@@ -139,7 +159,7 @@ export class Inicio {
     janelaDias: 7,
     qtdMinCompras: 3,
   };
-  protected excecao = { estabelecimentoId: 0, motivo: '' };
+  protected excecao = { nome: '', motivo: '' };
   protected titulo() {
     return (
       (
@@ -160,7 +180,7 @@ export class Inicio {
     );
   }
   protected navegar(id: string) {
-    this.aba.set(id);
+    this.aba.set(this.admin() ? 'saude' : id);
     this.menuAberto.set(false);
     this.aviso.set('');
     this.tipoAviso.set('info');
@@ -212,12 +232,52 @@ export class Inicio {
     });
   }
   protected consultarSaude() {
+    if (this.consultandoSaude()) return;
+    this.consultandoSaude.set(true);
+    this.erroSaude.set(false);
     this.api
       .saude()
       .subscribe({
         next: (r) => this.saude.set(r.status === 'UP' ? 'Disponível' : r.status),
-        error: () => this.saude.set('Não foi possível consultar'),
+        error: () => this.saude.set('Indisponível'),
       });
+    this.api.get<SaudeAdministrativa>('/admin/saude')
+      .pipe(finalize(() => this.consultandoSaude.set(false)))
+      .subscribe({
+        next: (resultado) => this.saudeAdmin.set(resultado),
+        error: () => this.erroSaude.set(true),
+      });
+  }
+  protected tipoConta(conta: Conta) {
+    if (conta.tipo === 'CREDIT') return 'Cartão de crédito';
+    if (conta.subtipo === 'CHECKING_ACCOUNT') return 'Conta corrente';
+    if (conta.subtipo === 'SAVINGS_ACCOUNT') return 'Conta poupança';
+    return 'Conta vinculada';
+  }
+  protected sincronizar(conta: Conta) {
+    if (!conta.podeSincronizar || this.sincronizando().includes(conta.id)) return;
+    this.sincronizando.update(ids => [...ids, conta.id]);
+    this.retornoSync.update(retornos => ({ ...retornos, [conta.id]: { texto: '', erro: false } }));
+    this.banco.sincronizar(conta.id).pipe(
+      takeUntilDestroyed(this.destroy),
+      finalize(() => this.sincronizando.update(ids => ids.filter(id => id !== conta.id))),
+    ).subscribe({
+      next: ({ novasTransacoes }) => {
+        this.retornoSync.update(retornos => ({ ...retornos, [conta.id]: {
+          texto: novasTransacoes === 0 ? 'Conta atualizada. Nenhuma transação nova.'
+            : `Conta atualizada. Novas transações: ${novasTransacoes}.`,
+          erro: false,
+        } }));
+        this.carregar();
+      },
+      error: (e) => {
+        const texto = e.status === 429 ? 'Limite diário de sincronizações atingido.'
+          : e.status === 409 ? 'Já há uma sincronização em andamento.'
+          : mensagemDeErro(e, 'Não foi possível sincronizar agora. Tente novamente.');
+        this.retornoSync.update(retornos => ({ ...retornos, [conta.id]: { texto, erro: true } }));
+        this.carregar(true);
+      },
+    });
   }
   protected carregar(silencioso = false) {
     if (this.atualizando) return;
@@ -256,7 +316,7 @@ export class Inicio {
         obs: this.api.get<Relatorio[]>('/relatorios'),
         set: (r: Relatorio[]) => {
           this.relatorios.set(r);
-          if (!this.mesRelatorio) this.mesRelatorio = r[0]?.mes ?? '';
+          if (!r.some(item => item.mes === this.mesRelatorio)) this.mesRelatorio = r[0]?.mes ?? '';
         },
       },
       {
@@ -304,22 +364,6 @@ export class Inicio {
   private sucessoAviso(texto: string) {
     this.tipoAviso.set('sucesso'); this.aviso.set(texto);
   }
-  protected gerarRelatorio() {
-    if (this.ocupado() || !this.mesGeracao) return;
-    this.ocupado.set(true);
-    this.api.gerarRelatorio(this.mesGeracao).pipe(finalize(() => this.ocupado.set(false))).subscribe({
-      next: r => {
-        this.relatorios.set(r); this.mesRelatorio = this.mesGeracao;
-        this.sucessoAviso('Relatório criado. Você já pode consultar e exportar.');
-      },
-      error: e => {
-        this.tipoAviso.set(e.status === 409 ? 'alerta' : 'erro');
-        this.aviso.set(e.status === 409
-          ? 'Este mês ainda não tem dados prontos. Aguarde a sincronização ou escolha outro mês.'
-          : mensagemDeErro(e, 'Não foi possível criar o relatório. Tente novamente.'));
-      },
-    });
-  }
   protected salvarRegra() {
     if (this.ocupado()) return;
     this.ocupado.set(true);
@@ -353,11 +397,8 @@ export class Inicio {
         error: (e) => this.erroAviso(mensagemDeErro(e, 'Não foi possível remover.')),
       });
   }
-  protected nomeLoja(id: number) {
-    return this.lojas().find((l) => l.id === id)?.nome ?? 'Estabelecimento ' + id;
-  }
   protected salvarExcecao() {
-    if (this.ocupado()) return;
+    if (this.ocupado() || !this.excecao.nome.trim()) return;
     this.ocupado.set(true);
     this.api
       .salvarExcecao(this.excecao, this.editandoExcecao)
@@ -365,7 +406,7 @@ export class Inicio {
       .subscribe({
         next: () => {
           this.editandoExcecao = null;
-          this.excecao = { estabelecimentoId: 0, motivo: '' };
+          this.excecao = { nome: '', motivo: '' };
           this.carregar();
           this.sucessoAviso('Lista branca atualizada.');
         },
@@ -375,7 +416,11 @@ export class Inicio {
   }
   protected editarExcecao(item: Excecao) {
     this.editandoExcecao = item.id;
-    this.excecao = { estabelecimentoId: item.estabelecimentoId, motivo: item.motivo };
+    this.excecao = { nome: item.nome, motivo: item.motivo };
+  }
+  protected cancelarExcecao() {
+    this.editandoExcecao = null;
+    this.excecao = { nome: '', motivo: '' };
   }
   protected exportar() {
     if (this.ocupado()) return;

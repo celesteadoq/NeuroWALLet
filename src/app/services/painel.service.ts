@@ -36,14 +36,19 @@ export interface Alerta {
   inicio: string;
   fim: string;
 }
-export interface Fatura {
-  mesReferencia: string;
+export interface ParcelasProjetadas {
   valorProjetado: number;
+  parcelas: number;
+}
+export interface Fatura extends ParcelasProjetadas {
+  mesReferencia: string;
+  porConta: (ParcelasProjetadas & { contaId: number })[];
 }
 export interface Selo {
   nome: string;
   criterioDias: number;
-  concedidoEm: string;
+  concedidoEm: string | null;
+  descricao: string;
 }
 export interface Relatorio {
   mes: string;
@@ -65,13 +70,16 @@ export interface Excecao {
   id: number;
   estabelecimentoId: number;
   motivo: string;
+  nome: string;
+}
+export interface SaudeAdministrativa {
+  consultadoEm: string;
+  provedores: { nome: string; estado: string }[];
+  registrosIa: { momento: string; mensagem: string; sucesso: boolean }[];
 }
 @Injectable({ providedIn: 'root' })
 export class PainelService {
   private readonly http = inject(HttpClient);
-  gerarRelatorio(mes: string) {
-    return this.http.post<Relatorio[]>('/api/relatorios?mes=' + encodeURIComponent(mes), {}).pipe(timeout(60000));
-  }
   analisar() {
     return this.http.post<Importacao>('/api/painel/analisar', {}).pipe(timeout(20000));
   }
@@ -86,7 +94,7 @@ export class PainelService {
   excluir(rota: string, id: number) {
     return this.http.delete<void>('/api' + rota + '/' + id).pipe(timeout(20000));
   }
-  salvarExcecao(p: { estabelecimentoId: number; motivo: string }, id: number | null) {
+  salvarExcecao(p: { nome: string; motivo?: string }, id: number | null) {
     return (
       id
         ? this.http.put<Excecao>('/api/lista-branca/' + id, p)
@@ -100,7 +108,7 @@ export class PainelService {
   }
   saude() {
     return this.http
-      .get<{ status: string; components?: Record<string, { status: string }> }>('/actuator/health')
+      .get<{ status: string }>('/actuator/health/ping')
       .pipe(timeout(20000));
   }
 }

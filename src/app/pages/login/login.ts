@@ -15,8 +15,9 @@ export class Login {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
-  protected readonly cadastroRecebido =
-    inject(ActivatedRoute).snapshot.queryParamMap.get('cadastro') === 'recebido';
+  private readonly rota = inject(ActivatedRoute).snapshot;
+  protected readonly administrativo = this.rota.data['administrativo'] === true;
+  protected readonly cadastroRecebido = this.rota.queryParamMap.get('cadastro') === 'recebido';
   protected readonly mostrarSenha = signal(false);
   protected readonly enviando = signal(false);
   protected readonly erro = signal<string | null>(null);
@@ -29,14 +30,14 @@ export class Login {
 
   constructor() {
     afterNextRender(() =>
-      this.authService.sessao().subscribe({
+      !this.administrativo && this.authService.sessao().subscribe({
         next: (s) => {
           if (s.autenticado) void this.router.navigateByUrl('/inicio');
         },
         error: () => {},
       }),
     );
-    if (typeof localStorage !== 'undefined') {
+    if (!this.administrativo && typeof localStorage !== 'undefined') {
       const email = localStorage.getItem('nw-email');
       if (email) this.form.patchValue({ email, lembrar: true });
     }
@@ -53,7 +54,7 @@ export class Login {
     }
     if (this.enviando()) return;
 
-    if (typeof localStorage !== 'undefined') {
+    if (!this.administrativo && typeof localStorage !== 'undefined') {
       const dados = this.form.getRawValue();
       if (dados.lembrar) localStorage.setItem('nw-email', dados.email);
       else localStorage.removeItem('nw-email');
@@ -61,7 +62,7 @@ export class Login {
     this.enviando.set(true);
     this.erro.set(null);
 
-    this.authService.login(this.form.getRawValue()).subscribe({
+    this.authService.login({ ...this.form.getRawValue(), administrativo: this.administrativo }).subscribe({
       // O back-end diz qual é o próximo passo; aqui só traduzimos em rota.
       next: ({ proximo }) => this.router.navigateByUrl(ROTA_POR_PASSO[proximo]),
       error: (erro) => {

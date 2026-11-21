@@ -6,6 +6,17 @@ export interface Conta {
   id: number;
   instituicao: string;
   ativa?: boolean;
+  tipo?: string;
+  subtipo?: string;
+  finalConta?: string;
+  titular?: string;
+  bandeira?: string;
+  diaFechamento?: number;
+  ultimaSincronizacao?: string;
+  sincronizacoesHoje?: number;
+  limiteDiario?: number;
+  sincronizacaoAutomatica?: boolean;
+  podeSincronizar?: boolean;
 }
 @Injectable({ providedIn: 'root' })
 export class BancoService {
@@ -36,6 +47,6 @@ export class BancoService {
     return this.http.post<{ novasTransacoes: number }>(
       API.baseUrl + '/contas/' + id + '/sincronizar',
       {},
-    );
+    ).pipe(timeout(180000));
   }
 }
