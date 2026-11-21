@@ -53,3 +53,5 @@ button:disabled {
 .bank-dialog .dialog-close { position:absolute; right:18px; top:8px; width:auto; padding:8px; border:0; background:transparent; }
 @keyframes bank-open { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 @media(prefers-reduced-motion:reduce) { .bank-dialog,.bank-dialog button { animation:none; transition:none; } }
+.achievement-history { max-height:280px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#ad3294 #f2eef4; padding-right:12px; }
+.achievement-history:focus-visible { outline:2px solid #ad3294; outline-offset:4px; border-radius:8px; }

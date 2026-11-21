@@ -79,6 +79,8 @@
               <p>Conecte suas contas para acompanhar tudo em um só lugar.</p>
               <button (click)="continuar('aurora')" [disabled]="enviando()">Banco Aurora — Demonstração →</button>
               <button (click)="continuar('horizonte')" [disabled]="enviando()">Banco Horizonte — Demonstração →</button>
+              <button (click)="continuar('pluggy')" [disabled]="enviando() || !pluggyConfigurado()">Conectar via Pluggy →</button>
+              @if (!pluggyConfigurado()) { <small>A conexão Pluggy precisa ser configurada pelo responsável pelo ambiente.</small> }
               <small>Você pode conectar mais de uma instituição.</small>
             </section>
           </div>

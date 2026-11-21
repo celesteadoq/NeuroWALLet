@@ -140,7 +140,7 @@
               <h2>Conquistas</h2>
               <p>
                 <strong class="days">{{ sequencia() }} dias</strong> sem compras fast-fashion na
-                sequência atual
+                sequência atual, até ontem
               </p>
               <p class="accent">{{ selos().length }} selos conquistados</p>
               <button class="link-button" (click)="navegar('conquistas')">
@@ -243,11 +243,14 @@
             </section>
             <section class="card">
               <h2>Seu histórico</h2>
-              @for (dia of dias().slice(0, 15); track dia) {
+              <p class="detail">Dias confirmados sem compras fast-fashion. Datas antigas não representam a sequência atual.</p>
+              <div class="achievement-history" tabindex="0" role="region" aria-label="Histórico de dias sem fast-fashion">
+              @for (dia of dias(); track dia) {
                 <p>{{ dia | date: 'dd/MM/yyyy' }} · Dia sem compras fast-fashion</p>
               } @empty {
                 <p class="empty">Seu histórico aparecerá após a análise de dias completos.</p>
               }
+              </div>
             </section>
           </div>
           <div class="badge-grid">

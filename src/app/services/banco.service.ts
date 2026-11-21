@@ -13,7 +13,7 @@ export class BancoService {
     return this.http.get<Conta[]>(API.baseUrl + '/contas').pipe(timeout(20000));
   }
   ambiente() {
-    return this.http.get<{ demonstracao: boolean }>(API.baseUrl + '/openfinance/ambiente').pipe(timeout(10000));
+    return this.http.get<{ demonstracao: boolean; pluggyConfigurado: boolean }>(API.baseUrl + '/openfinance/ambiente').pipe(timeout(10000));
   }
   iniciarConexao(banco?: string) {
     return this.listar().pipe(

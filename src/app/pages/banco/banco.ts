@@ -52,6 +52,7 @@ export class Banco {
   protected readonly enviando = signal(false);
   protected readonly erro = signal<string | null>(null);
   protected readonly demonstracao = signal(false);
+  protected readonly pluggyConfigurado = signal(false);
   protected readonly ambienteCarregado = signal(false);
   protected readonly escolhendo = signal(false);
   protected abrirConexao(): void {
@@ -60,7 +61,7 @@ export class Banco {
   }
   constructor() {
     this.banco.ambiente().subscribe({
-      next: (r) => { this.demonstracao.set(r.demonstracao); this.ambienteCarregado.set(true); },
+      next: (r) => { this.demonstracao.set(r.demonstracao); this.pluggyConfigurado.set(r.pluggyConfigurado); this.ambienteCarregado.set(true); },
       error: () => this.erro.set('Não foi possível consultar o ambiente. Atualize a página.'),
     });
   }
@@ -70,7 +71,7 @@ export class Banco {
     this.erro.set(null);
     this.banco.iniciarConexao(instituicao).subscribe({
       next: async (r) => {
-        if (this.demonstracao()) {
+        if (instituicao === 'aurora' || instituicao === 'horizonte') {
           void this.router.navigateByUrl('/banco/retorno');
           return;
         }
@@ -78,7 +79,7 @@ export class Banco {
           await carregar();
           new window.PluggyConnect({
             connectToken: r.accessToken,
-            includeSandbox: ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname),
+            includeSandbox: this.demonstracao() || ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname),
             onSuccess: () => {
               void this.router.navigateByUrl('/banco/retorno');
             },
