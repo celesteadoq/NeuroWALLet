@@ -61,6 +61,6 @@ npm.cmd test -- --watch=false
 
 O build gera `dist/neuro-wallet`. Para verificar o build localmente com o backend rodando na porta `8080`, execute `npm.cmd run serve:ssr:neuro-wallet` e abra [localhost:4000](http://localhost:4000). Ajuste `FRONTEND_ORIGIN` no backend para `http://localhost:4000` antes de iniciar a API com essa configuração.
 
-O painel segue a identidade visual do Figma, com navegação superior e menu compacto no celular. Inclui resumo, faturas, alertas, conquistas, contas, criação/edição/exclusão de gatilhos e lista branca, sumários e exportação de relatórios em CSV/PDF. As informações que a API não fornece não são simuladas. As animações respeitam a preferência de movimento reduzido. Termos de uso e política de privacidade possuem páginas próprias com texto de exemplo para revisão da equipe.
+O painel segue a identidade visual do Figma, com navegação superior e menu compacto no celular. Inclui resumo, faturas, alertas, conquistas, contas, criação/edição/exclusão de gatilhos e lista branca, sumários e exportação de relatórios em CSV/PDF. As informações que a API não fornece não são simuladas. As animações respeitam a preferência de movimento reduzido. Os Termos de Uso e a Política de Privacidade têm páginas próprias.
 
 A autenticação permite nova tentativa após erro, informa limites de requisições e possui tempo limite de rede. Os testes cobrem código incorreto, excesso de tentativas, sessão expirada e prevenção de envios duplicados.
