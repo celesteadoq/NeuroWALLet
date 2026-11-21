@@ -2,13 +2,8 @@
   <section class="login-card">
     <div class="titulo">
       <div class="titulo-texto">
-        @if (administrativo) {
-          <h1>Acesso administrativo</h1>
-          <p class="subtitulo">NeuroWALLet · SysAdmin</p>
-        } @else {
-          <h1>Bem-vindo ao<br />NeuroWALLet</h1>
-          <p class="subtitulo">Prazer em vê-lo</p>
-        }
+        <h1>Bem-vindo ao<br />NeuroWALLet</h1>
+        <p class="subtitulo">Prazer em vê-lo</p>
       </div>
       <img src="/images/Logo.png" alt="Logo NeuroWALLet" />
     </div>
@@ -56,11 +51,9 @@
         }
       </div>
       <div class="opcoes">
-        @if (!administrativo) {
-          <label class="remember" title="Manter sua sessão neste navegador até expirar ou sair"
-            ><input type="checkbox" formControlName="lembrar" />Manter conectado</label>
-        }
-        <a routerLink="/recuperar-senha">Esqueci minha senha</a>
+        <label class="remember" title="Manter sua sessão neste navegador até expirar ou sair"
+          ><input type="checkbox" formControlName="lembrar" />Manter conectado</label
+        ><a routerLink="/recuperar-senha">Esqueci minha senha</a>
       </div>
       @if (erro()) {
         <p class="erro" role="alert">{{ erro() }}</p>
@@ -70,12 +63,10 @@
           {{ enviando() ? 'Entrando…' : 'Login' }}
         </button>
       </div>
-      @if (!administrativo) {
-        <div class="button-criar">
-          <p>Ainda não tem uma conta?</p>
-          <a routerLink="/cadastro">Criar conta</a>
-        </div>
-      }
+      <div class="button-criar">
+        <p>Ainda não tem uma conta?</p>
+        <a routerLink="/cadastro">Criar conta</a>
+      </div>
     </form>
     <footer>
       <p>
@@ -84,7 +75,6 @@
       </p>
       <a routerLink="/politica-de-privacidade">Política de Privacidade</a
       ><a routerLink="/termos-de-uso">Termos de Uso</a>
-      <br /><a [routerLink]="administrativo ? '/login' : '/admin/login'">{{ administrativo ? 'Voltar ao login' : 'Acesso administrativo' }}</a>
     </footer>
   </section>
 </main>

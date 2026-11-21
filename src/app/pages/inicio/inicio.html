@@ -408,38 +408,72 @@
       @case ('lista') {
         <div class="dashboard-grid">
           <section class="card">
-            <h2>{{ editandoExcecao ? 'Editar exceção' : 'Adicionar despesa recorrente' }}</h2>
-            <form (ngSubmit)="salvarExcecao()">
-              <label>Estabelecimento ou assinatura
-                <input name="loja" [(ngModel)]="excecao.nome" maxlength="150" required
-                  list="estabelecimentos" placeholder="Ex.: Netflix" />
-                <datalist id="estabelecimentos">
-                  @for (loja of lojas(); track loja.id) { <option [value]="loja.nome"></option> }
-                </datalist>
-              </label>
-              <button class="primary" [disabled]="ocupado() || !excecao.nome.trim()">
-                {{ editandoExcecao ? 'Salvar alteração' : 'Adicionar à lista branca' }}
+            <h2>{{ editandoExcecao ? 'Editar exceção' : 'Adicionar estabelecimento' }}</h2>
+            <form
+              #listaForm="ngForm"
+              (ngSubmit)="listaForm.valid && excecao.estabelecimentoId > 0 && salvarExcecao()"
+            >
+              <label
+                >Estabelecimento ou assinatura<select
+                  name="loja"
+                  [(ngModel)]="excecao.estabelecimentoId"
+                  required
+                >
+                  <option [ngValue]="0" disabled>Selecione um estabelecimento ou assinatura</option>
+                  @for (loja of lojas(); track loja.id) {
+                    <option [ngValue]="loja.id">{{ loja.nome }}</option>
+                  }
+                </select></label
+              ><label
+                >Motivo<input
+                  name="motivo"
+                  [(ngModel)]="excecao.motivo"
+                  required
+                  maxlength="255"
+                  placeholder="Ex.: despesa recorrente" /></label
+              ><button
+                class="primary"
+                [disabled]="ocupado() || listaForm.invalid || excecao.estabelecimentoId === 0"
+              >
+                Salvar exceção
               </button>
               @if (editandoExcecao) {
-                <button type="button" class="link-button" (click)="cancelarExcecao()">Cancelar edição</button>
+                <button type="button" class="link-button" (click)="cancelarExcecao()">
+                  Cancelar edição
+                </button>
               }
             </form>
+            @if (!lojas().length) {
+              <p class="empty">
+                Os estabelecimentos ficam disponíveis após a importação e a classificação do
+                histórico.
+              </p>
+            }
           </section>
-          <div class="column">
-            @if (erros()['lista']) { <p class="error">{{ erros()['lista'] }}</p> }
+          <section class="card">
+            <h2>Minha lista branca</h2>
+            @if (erros()['lista']) {
+              <p class="error">{{ erros()['lista'] }}</p>
+            }
             @for (item of excecoes(); track item.id) {
-              <article class="card">
-                <h2>{{ item.nome }}</h2>
-                @if (item.motivo) { <p>{{ item.motivo }}</p> }
+              <article class="rule">
+                <h3>{{ nomeLoja(item.estabelecimentoId) }}</h3>
+                <p>{{ item.motivo }}</p>
                 <div class="row-actions">
-                  <button class="link-button" (click)="editarExcecao(item)">Editar</button>
-                  <button class="link-button" [disabled]="ocupado()" (click)="excluir('/lista-branca', item.id)">Remover</button>
+                  <button class="link-button" (click)="editarExcecao(item)">Editar</button
+                  ><button
+                    class="link-button"
+                    [disabled]="ocupado()"
+                    (click)="excluir('/lista-branca', item.id)"
+                  >
+                    Remover
+                  </button>
                 </div>
               </article>
             } @empty {
-              <section class="card"><p>Nenhum estabelecimento na lista branca.</p></section>
+              <p class="empty">Nenhum estabelecimento nas exceções.</p>
             }
-          </div>
+          </section>
         </div>
       }
       @case ('sumario') {
@@ -454,6 +488,7 @@
           <div class="dashboard-grid">
             <section class="card">
               <h2>Um mês de pequenas escolhas</h2>
+              <span class="accent">{{ r.geradoPorIa ? 'Texto gerado por IA' : 'Resumo dos dados do mês' }}</span>
               <p class="report-text">{{ r.texto }}</p>
             </section>
             <div class="column">

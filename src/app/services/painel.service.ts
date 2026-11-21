@@ -53,6 +53,7 @@ export interface Selo {
 export interface Relatorio {
   mes: string;
   texto: string;
+  geradoPorIa: boolean;
   maioresVazamentos: { estabelecimento: string; total: number }[];
 }
 export interface Parametros {
@@ -94,7 +95,7 @@ export class PainelService {
   excluir(rota: string, id: number) {
     return this.http.delete<void>('/api' + rota + '/' + id).pipe(timeout(20000));
   }
-  salvarExcecao(p: { nome: string; motivo?: string }, id: number | null) {
+  salvarExcecao(p: { estabelecimentoId: number; motivo: string }, id: number | null) {
     return (
       id
         ? this.http.put<Excecao>('/api/lista-branca/' + id, p)

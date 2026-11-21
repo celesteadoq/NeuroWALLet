@@ -12,7 +12,6 @@ export interface PassoResposta {
 }
 
 export interface LoginPedido {
-  administrativo?: boolean;
   email: string;
   senha: string;
   lembrar: boolean;

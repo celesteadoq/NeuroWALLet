@@ -159,7 +159,7 @@ export class Inicio {
     janelaDias: 7,
     qtdMinCompras: 3,
   };
-  protected excecao = { nome: '', motivo: '' };
+  protected excecao = { estabelecimentoId: 0, motivo: '' };
   protected titulo() {
     return (
       (
@@ -398,15 +398,14 @@ export class Inicio {
       });
   }
   protected salvarExcecao() {
-    if (this.ocupado() || !this.excecao.nome.trim()) return;
+    if (this.ocupado() || this.excecao.estabelecimentoId <= 0 || !this.excecao.motivo.trim()) return;
     this.ocupado.set(true);
     this.api
       .salvarExcecao(this.excecao, this.editandoExcecao)
       .pipe(finalize(() => this.ocupado.set(false)))
       .subscribe({
         next: () => {
-          this.editandoExcecao = null;
-          this.excecao = { nome: '', motivo: '' };
+          this.cancelarExcecao();
           this.carregar();
           this.sucessoAviso('Lista branca atualizada.');
         },
@@ -416,11 +415,16 @@ export class Inicio {
   }
   protected editarExcecao(item: Excecao) {
     this.editandoExcecao = item.id;
-    this.excecao = { nome: item.nome, motivo: item.motivo };
+    this.excecao = { estabelecimentoId: item.estabelecimentoId, motivo: item.motivo };
   }
   protected cancelarExcecao() {
     this.editandoExcecao = null;
-    this.excecao = { nome: '', motivo: '' };
+    this.excecao = { estabelecimentoId: 0, motivo: '' };
+  }
+  protected nomeLoja(id: number) {
+    return this.lojas().find(loja => loja.id === id)?.nome
+      ?? this.excecoes().find(item => item.estabelecimentoId === id)?.nome
+      ?? 'Estabelecimento ' + id;
   }
   protected exportar() {
     if (this.ocupado()) return;
