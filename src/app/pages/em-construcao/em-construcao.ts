@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-/** Página provisória para Termos, Política e Recuperar senha. O título vem da rota (data). */
 @Component({
   imports: [RouterLink],
   selector: 'app-em-construcao',

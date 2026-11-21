@@ -1,6 +1,5 @@
 import { Component, ElementRef, afterNextRender, computed, input, output, viewChildren } from '@angular/core';
 
-/** Campo de código com uma casa por dígito. Avisa a página por eventos. */
 @Component({
   imports: [],
   selector: 'app-codigo-verificacao',
@@ -11,9 +10,7 @@ export class CodigoVerificacao {
   readonly tamanho = input(6);
   readonly invalido = input(false);
 
-  /** A cada alteração, com o que foi digitado até agora. */
   readonly alterado = output<string>();
-  /** Quando todas as casas ficam preenchidas. */
   readonly completo = output<string>();
 
   private readonly campos = viewChildren<ElementRef<HTMLInputElement>>('campo');
@@ -24,7 +21,7 @@ export class CodigoVerificacao {
   );
 
   constructor() {
-    // Foco na primeira casa ao abrir a tela (só no navegador)
+    // Aguarda a renderização no navegador para acessar os campos do DOM.
     afterNextRender(() => this.focar(0));
   }
 
@@ -54,7 +51,6 @@ export class CodigoVerificacao {
     this.notificar();
   }
 
-  /** Limpa as casas (ex.: depois de um código errado). */
   limpar(): void {
     this.digitos = [];
     this.campos().forEach((c) => (c.nativeElement.value = ''));

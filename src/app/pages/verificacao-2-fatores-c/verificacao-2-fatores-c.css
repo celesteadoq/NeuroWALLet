@@ -91,7 +91,6 @@ input{
 .titulo-especifico p{
     font-size: 0.659rem;
 }
-/* Estilização do container de verificação de 2 fatores */
 
 .verification-container {
     display: flex;
@@ -130,7 +129,6 @@ label{
 }
 
 
-/* botão de login */
 
 
 
@@ -189,7 +187,6 @@ footer a {
     color: var(--laranja-principal);
     text-decoration: none;
 }
-/* botão com aparência de link ("Reenviar código", "Tentar de novo") */
 .reenviar {
   padding: 0;
   border: none;

@@ -62,7 +62,6 @@ export class Login {
     this.erro.set(null);
 
     this.authService.login(this.form.getRawValue()).subscribe({
-      // O back-end diz qual é o próximo passo; aqui só traduzimos em rota.
       next: ({ proximo }) => this.router.navigateByUrl(ROTA_POR_PASSO[proximo]),
       error: (erro) => {
         this.enviando.set(false);

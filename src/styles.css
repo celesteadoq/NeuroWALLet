@@ -20,7 +20,6 @@
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: 'Inter', system-ui, sans-serif; color: var(--cinza-escuro); }
 
-/* Estilos de formulário compartilhados pelas telas */
 .erro {
   margin: 0;
   padding: 0 0.5rem;
@@ -37,7 +36,6 @@ button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
-/* Feedback e escolhas da área autenticada. */
 .app-shell .notice { background:#edf4ff; color:#234b7d; border-left:4px solid #4d83c8; }
 .app-shell .notice-success { background:#eaf7ee; color:#20643c; border-color:#38a267; }
 .app-shell .notice-error { background:#fff0f0; color:#982d35; border-color:#d45661; }

@@ -12,7 +12,6 @@ import { mensagemDeErro } from '../../core/erros';
 import { ROTA_POR_PASSO } from '../../core/rotas';
 import { AuthService } from '../../services/auth.service';
 
-// Valida se a senha e a confirmação são iguais
 const senhasIguais: ValidatorFn = (control: AbstractControl) => {
   const senha = control.get('senha')?.value;
   const confirmar = control.get('confirmar')?.value;
@@ -67,7 +66,6 @@ export class Cadastro {
     this.enviando.set(true);
     this.erro.set(null);
 
-    // O consentimento explícito acompanha o cadastro.
     const { nome, email, senha } = this.form.getRawValue();
 
     this.authService

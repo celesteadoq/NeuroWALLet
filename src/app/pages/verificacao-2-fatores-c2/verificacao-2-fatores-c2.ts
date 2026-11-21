@@ -12,13 +12,11 @@ import { AuthService } from '../../services/auth.service';
 export class Verificacao2FatoresC2 {
   private readonly authService = inject(AuthService);
 
-  // A chave é gerada pelo back-end; o front só mostra e copia.
   protected readonly qr = signal<string | null>(null);
   protected readonly chave = signal<string | null>(null);
   protected readonly erro = signal<string | null>(null);
   protected readonly copiado = signal(false);
 
-  /** Exibe a chave em grupos de 4 letras (JBSW Y3DP ...), mas copia sem espaços. */
   protected readonly chaveFormatada = computed(
     () =>
       this.chave()

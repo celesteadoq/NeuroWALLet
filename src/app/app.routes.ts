@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  // ---------- entrada e cadastro (sem sessão) ----------
   {
     path: 'login',
     loadComponent: () => import('./pages/login/login').then((m) => m.Login),
@@ -33,7 +32,6 @@ export const routes: Routes = [
       ),
   },
 
-  // ---------- área logada (exige sessão) ----------
   {
     path: 'banco',
     canActivate: [authGuard],
@@ -61,7 +59,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/inicio/inicio').then((m) => m.Inicio),
   },
 
-  // ---------- páginas ainda em construção ----------
   {
     path: 'termos-de-uso',
     data: { titulo: 'Termos de Uso' },
